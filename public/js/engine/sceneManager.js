@@ -573,7 +573,8 @@ class SceneManager {
     if (this.dom.valViewers) this.dom.valViewers.textContent = eng.viewerCount || 0;
     if (this.dom.valLikes) this.dom.valLikes.textContent = eng.likes || 0;
     if (this.dom.valShares) this.dom.valShares.textContent = eng.shares || 0;
-    if (this.dom.valDiamonds) this.dom.valDiamonds.textContent = eng.diamonds || 0;
+    if (this.dom.valGifts) this.dom.valGifts.textContent = eng.totalGifts || 0;
+    if (this.dom.valComments) this.dom.valComments.textContent = eng.comments || 0;
     if (this.dom.valRound) this.dom.valRound.textContent = `ROUND ${String(round.roundNumber || 1).padStart(2, '0')}`;
   }
 
