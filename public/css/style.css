@@ -284,7 +284,7 @@ html, body {
 /* Engagement Metric Pills */
 .top-engagement-bar {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 6px;
 }
 
@@ -1520,7 +1520,7 @@ html, body {
 }
 
 /* Live TikTok comments: floating individual bubbles, no black panel */
-.live-chat-feed { position:fixed; right:12px; bottom:150px; width:min(88vw,360px); z-index:80; pointer-events:none; background:transparent; }
+.live-chat-feed { display:none !important; }
 .live-chat-header { display:none !important; }
 .live-chat-messages { display:flex; flex-direction:column; align-items:flex-end; gap:8px; max-height:330px; overflow:hidden; }
 .live-chat-message { display:flex; align-items:center; gap:8px; width:fit-content; max-width:100%; padding:8px 12px 8px 8px; border:1px solid rgba(0,242,254,.22); border-radius:18px 18px 5px 18px; background:rgba(8,16,31,.72); backdrop-filter:blur(10px); box-shadow:0 8px 24px rgba(0,0,0,.18), inset 0 0 18px rgba(0,242,254,.035); color:#fff; }
@@ -1555,4 +1555,14 @@ html, body {
   .p-slot { border-radius: 9px; }
   .slot-name { font-size: 8px; }
   .p-avatar.slot-img { width: 30px !important; height: 30px !important; }
+}
+
+/* Live HUD: five compact metrics stay on one row on mobile. */
+.top-engagement-bar { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+.engagement-pill { min-width: 0; }
+@media (max-width: 480px) {
+  .top-engagement-bar { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 4px; }
+  .engagement-pill { padding: 4px 2px; gap: 2px; border-radius: 10px; }
+  .engagement-pill .icon-svg { width: 12px; height: 12px; flex: 0 0 12px; }
+  .engagement-pill span:last-child { font-size: 9px; }
 }
