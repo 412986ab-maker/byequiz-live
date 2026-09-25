@@ -107,6 +107,8 @@ class GameEngine {
       // 1. Live Chat / Answers
       case "CHAT": {
         this.answers.processComment(payload, payload.comment || "");
+        this.events.emit("chat:received", payload);
+        this.renderChatMessage(payload);
         break;
       }
 
@@ -317,6 +319,29 @@ class GameEngine {
         this.events.emit("network:" + type, payload);
         break;
     }
+  }
+
+  renderChatMessage(payload = {}) {
+    const container = document.getElementById("live-chat-messages");
+    if (!container) return;
+    const comment = String(payload.comment || "").trim();
+    if (!comment) return;
+    const empty = document.getElementById("live-chat-empty");
+    if (empty) empty.remove();
+    const row = document.createElement("div");
+    row.className = "live-chat-message";
+    const name = document.createElement("strong");
+    name.className = "live-chat-name";
+    name.textContent = String(payload.nickname || payload.uniqueId || payload.id || "مشارك");
+    const msg = document.createElement("span");
+    msg.className = "live-chat-text";
+    msg.textContent = comment;
+    const body = document.createElement("div");
+    body.className = "live-chat-body";
+    body.append(name, msg);
+    row.appendChild(body);
+    container.appendChild(row);
+    while (container.children.length > 20) container.removeChild(container.firstElementChild);
   }
 
   startQuestion(questionId = null, duration = null) {
