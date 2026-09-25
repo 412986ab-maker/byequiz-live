@@ -871,10 +871,17 @@ async function initializePersistentGameSettings() {
     if (db.ready) await db.ready;
     const saved = await db.getSettings();
     if (saved && typeof saved === 'object') {
-      if (saved.targetParticipants !== undefined) serverGameState.targetParticipants = parseInt(saved.targetParticipants, 10) || 36;
-      if (saved.questionDuration !== undefined) serverGameState.questionDuration = parseInt(saved.questionDuration, 10) || 30;
+      if (saved.targetParticipants !== undefined) {
+        const target = Number(saved.targetParticipants);
+        if (Number.isFinite(target) && target >= 0) serverGameState.targetParticipants = target;
+      }
+      if (saved.questionDuration !== undefined) {
+        const duration = Number(saved.questionDuration);
+        if (Number.isFinite(duration) && duration > 0) serverGameState.questionDuration = duration;
+      }
       if (typeof saved.autoMode === 'boolean') serverGameState.autoMode = saved.autoMode;
       if (typeof saved.autoTransition === 'boolean') serverGameState.autoTransition = saved.autoTransition;
+      if (typeof saved.autoNextRound === 'boolean') serverGameState.autoNextRound = saved.autoNextRound;
       if (typeof saved.excludePreviousWinner === 'boolean') serverGameState.excludePreviousWinner = saved.excludePreviousWinner;
       logger.info('Persistent game settings loaded', { targetParticipants: serverGameState.targetParticipants });
     }
