@@ -208,7 +208,8 @@ const server = http.createServer(async (req, res) => {
       tiktok: tiktokConnector.getStatus(),
       game: serverGameState.getSnapshot(),
       database: db.getStatus(),
-      timestamp: Date.now()
+      timestamp: Date.now(),
+      simulatorEnabled: ENABLE_SIMULATOR || process.env.NODE_ENV !== 'production'
     });
   }
 
@@ -321,6 +322,7 @@ const server = http.createServer(async (req, res) => {
   // 5.1 PERSISTENT GAME SETTINGS
   // ==========================================
   if (pathname === '/api/settings' && req.method === 'GET') {
+    if (db.ready) await db.ready;
     const settings = await db.getSettings();
     return sendJSON(res, 200, { success: true, settings });
   }
@@ -329,6 +331,7 @@ const server = http.createServer(async (req, res) => {
     let body = '';
     req.on('data', chunk => body += chunk);
     req.on('end', async () => {
+      if (db.ready) await db.ready;
       const incoming = safeJSONParse(body, {});
       const settings = incoming.settings && typeof incoming.settings === 'object' ? incoming.settings : incoming;
       const allowed = ['targetParticipants','questionDuration','questionSelectionMode','autoMode','autoTransition','autoNextRound','excludePreviousWinner','engagementEnabled','engagementSound','engagementIntensity','giftPointsRate'];
@@ -384,11 +387,12 @@ const server = http.createServer(async (req, res) => {
           break;
         }
         case 'PAUSE_GAME': {
-          serverGameState.setState(GAME_STATES.PAUSED);
+          serverGameState.pauseGame();
           break;
         }
         case 'RESUME_GAME': {
-          serverGameState.setState(GAME_STATES.LOBBY);
+          const result = serverGameState.resumeGame();
+          if (!result.success) return sendJSON(res, 409, { success: false, error: 'اللعبة ليست متوقفة مؤقتاً', state: result.state });
           break;
         }
         case 'STOP_GAME': {
@@ -409,6 +413,7 @@ const server = http.createServer(async (req, res) => {
             if (cmd.payload.questionDuration) serverGameState.questionDuration = parseInt(cmd.payload.questionDuration, 10);
             if (typeof cmd.payload.autoMode === 'boolean') serverGameState.autoMode = cmd.payload.autoMode;
             if (typeof cmd.payload.autoTransition === 'boolean') serverGameState.autoTransition = cmd.payload.autoTransition;
+            if (typeof cmd.payload.autoNextRound === 'boolean') serverGameState.autoNextRound = cmd.payload.autoNextRound;
             if (typeof cmd.payload.excludePreviousWinner === 'boolean') serverGameState.excludePreviousWinner = cmd.payload.excludePreviousWinner;
           }
           eventBus.dispatch('UPDATE_SETTINGS', cmd.payload || {}, 'ADMIN');
