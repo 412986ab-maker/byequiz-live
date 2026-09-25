@@ -515,6 +515,7 @@
           <div class="btn-grid">
             <button class="btn btn-dark" onclick="simulateUsersJoin(6)"> +6 مشاركين</button>
             <button class="btn btn-dark" onclick="simulateUsersJoin(36)">إكمال 36 مشارك</button>
+            <button class="btn btn-teal" onclick="saveSettings()">💾 حفظ إعدادات التفاعل</button>
             <button class="btn btn-dark" onclick="simulateAnswers(5, true)"> 5 إجابات صحيحة</button>
             <button class="btn btn-dark" onclick="simulateAnswers(3, false)"> 3 إجابات خاطئة</button>
           </div>
@@ -528,6 +529,7 @@
             <button class="btn btn-dark" onclick="simulateLikes(1000)">+1,000 لايك (Milestone)</button>
             <button class="btn btn-rose" onclick="simulateLikeJump(9200, 12400)">قفزة: 9,200 → 12,400</button>
             <button class="btn btn-dark" onclick="simulateLikes(10000)">+10,000 لايك</button>
+            <button class="btn btn-dark" onclick="simulateShares(10)">+10 مشاركات</button>
           </div>
         </div>
 
@@ -1038,7 +1040,7 @@
     function simulateUsersJoin(count = 5) {
       for (let i = 0; i < count; i++) {
         const u = getRandomUser();
-        sendCmd('CHAT', { ...u, comment: 'تم' });
+        sendCmd('SIMULATE_EVENT', { type: 'ROOM_USER', data: { ...u, viewerCount: Math.min(999999, i + 1) } });
       }
     }
 
@@ -1058,15 +1060,15 @@
 
     function simulateLikes(count = 100) {
       simTotalLikes += count;
-      sendCmd('LIKE', { likeCount: count, totalLikeCount: simTotalLikes });
+      sendCmd('SIMULATE_EVENT', { type: 'LIKE', data: { likeCount: count, totalLikeCount: simTotalLikes } });
     }
 
     function simulateLikeJump(fromVal = 9200, toVal = 12400) {
       simTotalLikes = fromVal;
-      sendCmd('LIKE', { likeCount: 1, totalLikeCount: fromVal });
+      sendCmd('SIMULATE_EVENT', { type: 'LIKE', data: { likeCount: 1, totalLikeCount: fromVal } });
       setTimeout(() => {
         simTotalLikes = toVal;
-        sendCmd('LIKE', { likeCount: toVal - fromVal, totalLikeCount: toVal });
+        sendCmd('SIMULATE_EVENT', { type: 'LIKE', data: { likeCount: toVal - fromVal, totalLikeCount: toVal } });
       }, 500);
     }
 
@@ -1081,13 +1083,17 @@
       ];
       const g = gifts[level - 1] || gifts[0];
 
-      sendCmd('GIFT', {
+      sendCmd('SIMULATE_EVENT', { type: 'GIFT', data: {
         ...u,
         giftName: g.name,
         giftCount: 1,
         diamondCount: g.diamonds,
         diamonds: g.diamonds
-      });
+      } });
+    }
+
+    function simulateShares(count = 10) {
+      sendCmd('SIMULATE_EVENT', { type: 'SHARE', data: { shareCount: count, totalShareCount: count } });
     }
 
     // Initialize Questions on startup
