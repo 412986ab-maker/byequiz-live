@@ -105,6 +105,25 @@ class GameEngine {
     }
 
     switch (type) {
+      case "INIT_SNAPSHOT": {
+        const game = msg && msg.payload && msg.payload.game ? msg.payload.game : {};
+        const settings = { ...(game.settings || {}) };
+        if (game.targetParticipants !== undefined) settings.targetParticipants = game.targetParticipants;
+        if (game.questionDuration !== undefined) settings.questionDuration = game.questionDuration;
+        if (typeof game.autoMode === "boolean") settings.autoMode = game.autoMode;
+        if (typeof game.autoTransition === "boolean") settings.autoTransition = game.autoTransition;
+        if (typeof game.excludePreviousWinner === "boolean") settings.excludePreviousWinner = game.excludePreviousWinner;
+        this.state.updateSettings(settings);
+        break;
+      }
+
+      case "SETTINGS_UPDATED":
+      case "UPDATE_SETTINGS": {
+        const settings = payload && payload.settings ? payload.settings : payload || {};
+        this.state.updateSettings(settings);
+        break;
+      }
+
       // 1. Live Chat / Answers
       case "CHAT": {
         this.answers.processComment(payload, payload.comment || "");
@@ -331,19 +350,28 @@ class GameEngine {
     const empty = document.getElementById("live-chat-empty");
     if (empty) empty.remove();
     const row = document.createElement("div");
-    row.className = "live-chat-message";
+    row.className = "live-chat-message animate-chat-in";
+    const avatar = document.createElement("img");
+    avatar.className = "live-chat-avatar";
+    avatar.alt = "";
+    avatar.src = String(payload.avatar || payload.profilePictureUrl || "");
+    avatar.onerror = () => { avatar.src = ""; avatar.classList.add("avatar-fallback"); };
+    const body = document.createElement("div");
+    body.className = "live-chat-body";
     const name = document.createElement("strong");
     name.className = "live-chat-name";
-    name.textContent = String(payload.nickname || payload.uniqueId || payload.id || "مشارك");
+    name.textContent = String(payload.displayName || payload.nickname || payload.uniqueId || payload.id || "مشارك");
     const msg = document.createElement("span");
     msg.className = "live-chat-text";
     msg.textContent = comment;
-    const body = document.createElement("div");
-    body.className = "live-chat-body";
     body.append(name, msg);
-    row.appendChild(body);
+    row.append(avatar, body);
     container.appendChild(row);
-    while (container.children.length > 20) container.removeChild(container.firstElementChild);
+    while (container.children.length > 4) container.removeChild(container.firstElementChild);
+    window.setTimeout(() => {
+      row.classList.add("animate-chat-out");
+      window.setTimeout(() => row.remove(), 450);
+    }, 5200);
   }
 
   startQuestion(questionId = null, duration = null) {
