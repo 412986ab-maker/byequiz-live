@@ -25,6 +25,8 @@ class SceneManager {
       valViewers: typeof document !== 'undefined' ? document.getElementById('val-viewers') : null,
       valLikes: typeof document !== 'undefined' ? document.getElementById('val-likes') : null,
       valShares: typeof document !== 'undefined' ? document.getElementById('val-shares') : null,
+      valGifts: typeof document !== 'undefined' ? document.getElementById('val-gifts') : null,
+      valComments: typeof document !== 'undefined' ? document.getElementById('val-comments') : null,
       valDiamonds: typeof document !== 'undefined' ? document.getElementById('val-diamonds') : null,
       valRound: typeof document !== 'undefined' ? document.getElementById('val-round') : null,
       leaderboardList: typeof document !== 'undefined' ? document.getElementById('footer-leaderboard-items') : null
@@ -89,6 +91,10 @@ class SceneManager {
     if (this.rouletteInterval) {
       clearInterval(this.rouletteInterval);
       this.rouletteInterval = null;
+    }
+    if (this.seatPageTimer && !['JOIN', 'REGISTRATION'].includes(sceneName)) {
+      clearInterval(this.seatPageTimer);
+      this.seatPageTimer = null;
     }
 
     // Timer visibility: Active during QUESTION, ANSWERING, LOCK
@@ -240,13 +246,15 @@ class SceneManager {
       this.dom.headerCategory.innerHTML = `${IconSystem.get('participants', { size: 16 })} <span>مرحلة الانضمام والتسجيل</span>`;
     }
 
-    const target = this.state.get('settings').targetParticipants || 36;
+    const targetRaw = Number(this.state.get('settings').targetParticipants);
+    const target = Number.isFinite(targetRaw) && targetRaw >= 0 ? targetRaw : 36;
     const pool = this.participants.getDrawPoolUsers();
+    const targetLabel = target > 0 ? String(target) : '∞';
 
     this.dom.stage.innerHTML = `
       <div class="scene-frame">
         <div class="scene-title-badge">
-          ${IconSystem.get('participants', { size: 14 })} <span>مقاعد المتسابقين (${pool.length} / ${target})</span>
+          ${IconSystem.get('participants', { size: 14 })} <span>مقاعد المتسابقين (<bdi dir="ltr">${pool.length} / ${targetLabel}</bdi>)</span>
         </div>
         <div class="join-grid-container" id="reg-grid">
           <!-- Filled dynamically -->
@@ -265,13 +273,14 @@ class SceneManager {
     const gridEl = document.getElementById('reg-grid');
     if (!gridEl) return;
 
-    const target = this.state.get('settings').targetParticipants || 36;
+    const targetRaw = Number(this.state.get('settings').targetParticipants);
+    const target = Number.isFinite(targetRaw) && targetRaw >= 0 ? targetRaw : 36;
     const pool = this.participants.getDrawPoolUsers();
 
     // The mobile broadcast stage has 36 visible seats (6x6).
     // Larger rounds are paged automatically so cards never overlap or shrink into unusable tiles.
     const visibleSeats = 36;
-    const pageCount = Math.max(1, Math.ceil(Math.max(pool.length, target) / visibleSeats));
+    const pageCount = Math.max(1, Math.ceil(pool.length / visibleSeats));
     this.seatPage = Math.min(this.seatPage, pageCount - 1);
 
     const start = this.seatPage * visibleSeats;
