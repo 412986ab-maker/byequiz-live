@@ -3,7 +3,7 @@
  * Caches essential static assets (HTML, CSS, JS, icons) while strictly
  * bypassing dynamic TikTok streams, SSE (/api/events), and live REST endpoints.
  */
-const CACHE_NAME = 'byequiz-v3-static';
+const CACHE_NAME = 'byequiz-v4-static';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
