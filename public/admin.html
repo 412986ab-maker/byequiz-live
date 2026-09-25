@@ -1145,7 +1145,23 @@
       }
     }
 
+    async function hideProductionSimulator() {
+      try {
+        const res = await fetch('/api/status', { cache: 'no-store' });
+        const data = await res.json();
+        const tab = Array.from(document.querySelectorAll('.tab-btn')).find(b => b.getAttribute('onclick') && b.getAttribute('onclick').includes('tab-simulator'));
+        const panel = document.getElementById('tab-simulator');
+        if (data && data.simulatorEnabled === false) {
+          if (tab) tab.remove();
+          if (panel) panel.remove();
+        }
+      } catch (e) {
+        console.warn('Could not determine simulator availability', e);
+      }
+    }
+
     // Initialize Questions and SSE on startup
+    hideProductionSimulator();
     loadQuestionsTable();
     loadSavedSettings();
     initAdminSSE();
