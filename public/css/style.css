@@ -1527,3 +1527,6 @@ html, body {
 .animate-chat-out { animation:chatBubbleOut .45s ease-in forwards; }
 @keyframes chatBubbleIn { from { opacity:0; transform:translate3d(22px,12px,0) scale(.92); } to { opacity:1; transform:translate3d(0,0,0) scale(1); } }
 @keyframes chatBubbleOut { to { opacity:0; transform:translate3d(30px,-8px,0) scale(.92); } }
+
+.comment-pill { border-color: rgba(0,242,254,.28); }
+.comment-pill .icon-svg { filter: drop-shadow(0 0 5px rgba(0,242,254,.35)); }
