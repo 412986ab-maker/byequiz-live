@@ -129,6 +129,15 @@ class GameEngine {
         this.answers.processComment(payload, payload.comment || "");
         this.events.emit("chat:received", payload);
         this.renderChatMessage(payload);
+        const eng = this.state.get("engagement");
+        eng.comments = (eng.comments || 0) + 1;
+        this.state.setEngagement(eng);
+        break;
+      }
+      case "COMMENT_COUNT_UPDATED": {
+        const eng = this.state.get("engagement");
+        eng.comments = payload.totalComments || 0;
+        this.state.setEngagement(eng);
         break;
       }
 
@@ -238,6 +247,10 @@ class GameEngine {
 
       case "STOP_GAME": {
         this.scenes.transitionTo("WAITING");
+        break;
+      }
+      case "ROUND_RESET": {
+        this.scenes.transitionTo("REGISTRATION");
         break;
       }
 
