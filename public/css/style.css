@@ -1512,3 +1512,18 @@ html, body {
   max-width: 260px;
   line-height: 1.4;
 }
+
+/* Live TikTok comments: floating individual bubbles, no black panel */
+.live-chat-feed { position:fixed; right:12px; bottom:150px; width:min(88vw,360px); z-index:80; pointer-events:none; background:transparent; }
+.live-chat-header { display:none !important; }
+.live-chat-messages { display:flex; flex-direction:column; align-items:flex-end; gap:8px; max-height:330px; overflow:hidden; }
+.live-chat-message { display:flex; align-items:center; gap:8px; width:fit-content; max-width:100%; padding:8px 12px 8px 8px; border:1px solid rgba(0,242,254,.22); border-radius:18px 18px 5px 18px; background:rgba(8,16,31,.72); backdrop-filter:blur(10px); box-shadow:0 8px 24px rgba(0,0,0,.18), inset 0 0 18px rgba(0,242,254,.035); color:#fff; }
+.live-chat-avatar { width:32px; height:32px; flex:0 0 32px; border-radius:50%; object-fit:cover; background:linear-gradient(135deg,rgba(0,242,254,.35),rgba(168,85,247,.35)); border:1px solid rgba(0,242,254,.35); }
+.live-chat-avatar.avatar-fallback { opacity:.7; }
+.live-chat-body { display:flex; flex-direction:column; min-width:0; text-align:right; }
+.live-chat-name { font-size:11px; font-weight:900; color:var(--cyber-cyan); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.live-chat-text { display:block; font-size:12px; line-height:1.35; color:#f4f7ff; overflow-wrap:anywhere; }
+.animate-chat-in { animation:chatBubbleIn .35s ease-out both; }
+.animate-chat-out { animation:chatBubbleOut .45s ease-in forwards; }
+@keyframes chatBubbleIn { from { opacity:0; transform:translate3d(22px,12px,0) scale(.92); } to { opacity:1; transform:translate3d(0,0,0) scale(1); } }
+@keyframes chatBubbleOut { to { opacity:0; transform:translate3d(30px,-8px,0) scale(.92); } }
