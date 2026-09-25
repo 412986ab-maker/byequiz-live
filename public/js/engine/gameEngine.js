@@ -194,8 +194,12 @@ class GameEngine {
       case "GIFT": {
         this.events.emit("gift:received", payload);
         this.events.emit("engagement:gift_update", payload);
-
-        const diamonds = payload.diamonds || ((payload.diamondCount || 1) * (payload.giftCount || 1)) || 0;
+        const eng = this.state.get("engagement");
+        const giftCount = Math.max(1, Number(payload.giftCount || payload.repeatCount || 1));
+        const diamonds = Number(payload.diamonds || ((payload.diamondCount || 0) * giftCount) || 0);
+        eng.totalGifts = Number(eng.totalGifts || 0) + giftCount;
+        eng.totalDiamonds = Number(eng.totalDiamonds || 0) + diamonds;
+        this.state.updateEngagement(eng);
         const giftType = diamonds >= 1000 ? "CRITICAL_GIFT" : (diamonds >= 100 ? "SPECIAL_GIFT" : "NORMAL_GIFT");
 
         this.events.emit("reaction:enqueue", {
