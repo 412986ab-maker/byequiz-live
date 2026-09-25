@@ -370,7 +370,8 @@ const server = http.createServer(async (req, res) => {
           serverGameState.startNewRound(cmd.payload?.roundNumber);
           break;
         }
-        case 'START_QUESTION': {
+        case 'START_QUESTION':
+        case 'NEXT_QUESTION': {
           serverGameState.startQuestion(cmd.payload?.questionId);
           break;
         }
@@ -388,6 +389,14 @@ const server = http.createServer(async (req, res) => {
         }
         case 'RESUME_GAME': {
           serverGameState.setState(GAME_STATES.LOBBY);
+          break;
+        }
+        case 'STOP_GAME': {
+          serverGameState.stopGame();
+          break;
+        }
+        case 'RESET_ROUND': {
+          serverGameState.resetRound();
           break;
         }
         case 'RESET_ALL': {
