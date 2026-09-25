@@ -107,13 +107,65 @@ class GameEngine {
     switch (type) {
       case "INIT_SNAPSHOT": {
         const game = msg && msg.payload && msg.payload.game ? msg.payload.game : {};
-        const settings = { ...(game.settings || {}) };
+        const settings = { ...(game.settings || {}), ...(game.targetSettings || {}) };
         if (game.targetParticipants !== undefined) settings.targetParticipants = game.targetParticipants;
         if (game.questionDuration !== undefined) settings.questionDuration = game.questionDuration;
         if (typeof game.autoMode === "boolean") settings.autoMode = game.autoMode;
         if (typeof game.autoTransition === "boolean") settings.autoTransition = game.autoTransition;
         if (typeof game.excludePreviousWinner === "boolean") settings.excludePreviousWinner = game.excludePreviousWinner;
         this.state.updateSettings(settings);
+        if (Array.isArray(game.participants) || Array.isArray(game.drawPool)) this.participants.syncFromSnapshot(game.participants || [], game.drawPool || []);
+        if (game.engagement) this.state.updateEngagement({
+          likes: Number(game.engagement.likes || 0),
+          shares: Number(game.engagement.shares || 0),
+          comments: Number(game.engagement.comments || 0),
+          followers: Number(game.engagement.followers || 0),
+          viewerCount: Number(game.engagement.viewers || 0),
+          totalGifts: Number(game.engagement.totalGifts || 0),
+          totalDiamonds: Number(game.engagement.diamonds || 0)
+        });
+        if (game.roundNumber !== undefined) this.state.set("round", { ...this.state.get("round"), roundNumber: Number(game.roundNumber) || 1 });
+        if (game.currentQuestion) this.state.set("currentQuestion", game.currentQuestion);
+        if (game.remainingSeconds !== undefined) this.state.set("timer", {
+          duration: settings.questionDuration || 15,
+          remaining: Number(game.remainingSeconds) || 0,
+          active: ["QUESTION", "ANSWERING"].includes(game.state)
+        });
+        this.syncSceneFromServerState(game.state);
+        break;
+      }
+
+      case "GAME_STATE_CHANGED": {
+        this.applyServerSnapshot(payload && payload.state ? payload : (msg.payload || {}));
+        break;
+      }
+
+      case "PARTICIPANT_JOINED": {
+        const p = payload && payload.participant ? payload.participant : payload;
+        if (p && p.id) this.participants.syncFromSnapshot(
+          [...this.participants.getAllParticipants().filter(u => u.id !== String(p.id)), p],
+          [...this.participants.drawPool.filter(id => id !== String(p.id)), String(p.id)]
+        );
+        break;
+      }
+
+      case "QUESTION_STARTED": {
+        if (payload.question) this.state.set("currentQuestion", payload.question);
+        this.state.set("timer", { duration: Number(payload.duration || this.state.get("settings").questionDuration || 15), remaining: Number(payload.duration || this.state.get("settings").questionDuration || 15), active: true });
+        this.scenes.transitionTo("QUESTION");
+        break;
+      }
+
+      case "QUESTION_ENDED": {
+        this.state.set("timer", { ...this.state.get("timer"), active: false, remaining: 0 });
+        this.scenes.transitionTo("ANSWERS");
+        break;
+      }
+
+      case "GAME_RESET": {
+        this.participants.clearParticipants();
+        this.state.resetAll();
+        this.scenes.transitionTo("WAITING");
         break;
       }
 
@@ -349,6 +401,48 @@ class GameEngine {
       default:
         this.events.emit("network:" + type, payload);
         break;
+    }
+  }
+
+  applyServerSnapshot(game = {}) {
+    const settings = { ...(game.targetSettings || {}) };
+    if (game.targetParticipants !== undefined) settings.targetParticipants = game.targetParticipants;
+    if (game.questionDuration !== undefined) settings.questionDuration = game.questionDuration;
+    if (typeof game.autoMode === "boolean") settings.autoMode = game.autoMode;
+    if (typeof game.autoTransition === "boolean") settings.autoTransition = game.autoTransition;
+    if (typeof game.excludePreviousWinner === "boolean") settings.excludePreviousWinner = game.excludePreviousWinner;
+    if (Object.keys(settings).length) this.state.updateSettings(settings);
+    if (Array.isArray(game.participants) || Array.isArray(game.drawPool)) this.participants.syncFromSnapshot(game.participants || [], game.drawPool || []);
+    if (game.engagement) this.state.updateEngagement({
+      likes: Number(game.engagement.likes || 0),
+      shares: Number(game.engagement.shares || 0),
+      comments: Number(game.engagement.comments || 0),
+      followers: Number(game.engagement.followers || 0),
+      viewerCount: Number(game.engagement.viewers || 0),
+      totalGifts: Number(game.engagement.totalGifts || 0),
+      totalDiamonds: Number(game.engagement.diamonds || 0)
+    });
+    if (game.roundNumber !== undefined) this.state.set("round", { ...this.state.get("round"), roundNumber: Number(game.roundNumber) || 1 });
+    if (game.currentQuestion) this.state.set("currentQuestion", game.currentQuestion);
+    if (game.remainingSeconds !== undefined) this.state.set("timer", {
+      duration: this.state.get("settings").questionDuration || 15,
+      remaining: Number(game.remainingSeconds) || 0,
+      active: ["QUESTION", "ANSWERING"].includes(game.state)
+    });
+    this.syncSceneFromServerState(game.state);
+  }
+
+  syncSceneFromServerState(serverState) {
+    switch (serverState) {
+      case "LOBBY": this.scenes.transitionTo(this.participants.count() ? "REGISTRATION" : "WAITING"); break;
+      case "PLAYER_SELECTION": this.scenes.transitionTo("PARTICIPANTS"); break;
+      case "QUESTION":
+      case "ANSWERING": this.scenes.transitionTo("QUESTION"); break;
+      case "RESULT": this.scenes.transitionTo("ANSWERS"); break;
+      case "WINNER": this.scenes.transitionTo("WINNER"); break;
+      case "NEXT_ROUND": this.scenes.transitionTo("REGISTRATION"); break;
+      case "ENDED": this.scenes.transitionTo("WAITING"); break;
+      default: break;
     }
   }
 
