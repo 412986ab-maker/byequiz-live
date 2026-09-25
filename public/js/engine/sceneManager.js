@@ -303,7 +303,7 @@ class SceneManager {
     if (pageCount > 1) {
       this.seatPageTimer = setInterval(() => {
         const currentPool = this.participants.getDrawPoolUsers();
-        const currentPages = Math.max(1, Math.ceil(Math.max(currentPool.length, target) / visibleSeats));
+        const currentPages = Math.max(1, Math.ceil(currentPool.length / visibleSeats));
         this.seatPage = (this.seatPage + 1) % currentPages;
         this.renderRegistrationGrid();
       }, 4500);
