@@ -344,6 +344,7 @@ const server = http.createServer(async (req, res) => {
       if (clean.questionDuration !== undefined) serverGameState.questionDuration = clean.questionDuration;
       const ok = await db.setSettings(clean);
       eventBus.dispatch('SETTINGS_UPDATED', { settings: clean }, 'ADMIN');
+      eventBus.dispatch('UPDATE_SETTINGS', clean, 'ADMIN');
       return sendJSON(res, ok ? 200 : 500, { success: ok, settings: clean });
     });
     return;
@@ -401,6 +402,7 @@ const server = http.createServer(async (req, res) => {
             if (typeof cmd.payload.autoTransition === 'boolean') serverGameState.autoTransition = cmd.payload.autoTransition;
             if (typeof cmd.payload.excludePreviousWinner === 'boolean') serverGameState.excludePreviousWinner = cmd.payload.excludePreviousWinner;
           }
+          eventBus.dispatch('UPDATE_SETTINGS', cmd.payload || {}, 'ADMIN');
           break;
         }
         case 'SIMULATE_EVENT': {
@@ -850,7 +852,25 @@ const server = http.createServer(async (req, res) => {
   });
 });
 
-const serverInstance = server.listen(PORT, () => {
+async function initializePersistentGameSettings() {
+  try {
+    if (db.ready) await db.ready;
+    const saved = await db.getSettings();
+    if (saved && typeof saved === 'object') {
+      if (saved.targetParticipants !== undefined) serverGameState.targetParticipants = parseInt(saved.targetParticipants, 10) || 36;
+      if (saved.questionDuration !== undefined) serverGameState.questionDuration = parseInt(saved.questionDuration, 10) || 30;
+      if (typeof saved.autoMode === 'boolean') serverGameState.autoMode = saved.autoMode;
+      if (typeof saved.autoTransition === 'boolean') serverGameState.autoTransition = saved.autoTransition;
+      if (typeof saved.excludePreviousWinner === 'boolean') serverGameState.excludePreviousWinner = saved.excludePreviousWinner;
+      logger.info('Persistent game settings loaded', { targetParticipants: serverGameState.targetParticipants });
+    }
+  } catch (err) {
+    logger.warn('Could not load persistent game settings at startup', { error: err.message });
+  }
+}
+
+const serverInstance = server.listen(PORT, async () => {
+  await initializePersistentGameSettings();
   logger.info(`🚀 BYE BYE Production Server running on port ${PORT}`);
   logger.info(`📺 Viewer Overlay:   http://localhost:${PORT}/`);
   logger.info(`📡 Broadcast Screen: http://localhost:${PORT}/broadcast`);
