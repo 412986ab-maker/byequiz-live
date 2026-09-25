@@ -522,11 +522,14 @@ html, body {
 
 .join-grid-container {
   width: 100%;
-  flex: 1;
+  flex: 1 1 auto;
+  min-height: 0;
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  grid-template-rows: repeat(6, minmax(0, 1fr));
+  grid-auto-flow: row;
   gap: 5px;
-  align-content: center;
+  align-content: stretch;
   padding: 4px 0;
   overflow: hidden;
 }
@@ -541,7 +544,10 @@ html, body {
   align-items: center;
   justify-content: center;
   position: relative;
-  transition: all 0.25s ease;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  transition: transform 0.35s ease, opacity 0.35s ease, border-color 0.25s ease, box-shadow 0.25s ease;
 }
 
 .p-slot.empty .slot-num {
@@ -1530,3 +1536,23 @@ html, body {
 
 .comment-pill { border-color: rgba(0,242,254,.28); }
 .comment-pill .icon-svg { filter: drop-shadow(0 0 5px rgba(0,242,254,.35)); }
+
+
+/* Stable 6x6 mobile seat wall. Participants move between real cells; they never float over the grid. */
+.join-grid-container .p-slot.occupied {
+  animation: seat-enter 0.38s cubic-bezier(.22,1,.36,1) both;
+}
+.join-grid-container .p-slot:nth-child(6n+1) { border-radius: 10px 14px 10px 10px; }
+.join-grid-container .p-slot:nth-child(6n) { border-radius: 14px 10px 10px 10px; }
+
+@keyframes seat-enter {
+  from { opacity: 0; transform: translateY(10px) scale(.94); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@media (max-width: 480px) {
+  .join-grid-container { gap: 4px; }
+  .p-slot { border-radius: 9px; }
+  .slot-name { font-size: 8px; }
+  .p-avatar.slot-img { width: 30px !important; height: 30px !important; }
+}
