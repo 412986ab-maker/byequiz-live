@@ -686,13 +686,23 @@
 
     async function sendCmd(type, payload = {}) {
       try {
-        await fetch('/api/command', {
+        const res = await fetch('/api/command', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ type, payload })
         });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok || data.success === false) {
+          console.warn('Command rejected:', type, data);
+          if (type === 'SIMULATE_EVENT') {
+            alert(data.error || 'المحاكي غير متاح في وضع الإنتاج.');
+          }
+          return false;
+        }
+        return true;
       } catch (e) {
         console.error('Command error:', e);
+        return false;
       }
     }
 
@@ -1053,7 +1063,7 @@
         const u = getRandomUser();
         const comment = answers[Math.floor(Math.random() * answers.length)];
         setTimeout(() => {
-          sendCmd('CHAT', { ...u, comment });
+          sendCmd('SIMULATE_EVENT', { type: 'CHAT', data: { ...u, comment } });
         }, i * 350);
       }
     }
