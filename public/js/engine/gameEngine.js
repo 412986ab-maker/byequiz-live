@@ -88,7 +88,8 @@ class GameEngine {
   }
 
   handleIncomingMessage(msg) {
-    const { type, payload } = msg;
+    const { type } = msg;
+    const payload = { ...(msg && msg.payload ? msg.payload : {}), ...(msg && msg.user ? msg.user : {}) };
 
     // Update LIVE status indicator on real TikTok status events
     if (type === "INIT_SNAPSHOT" && payload && payload.tiktok) {
@@ -183,6 +184,7 @@ class GameEngine {
       }
 
       // 6. Live Viewer Count Update
+      case "ROOM_USER":
       case "VIEWER_UPDATE": {
         if (payload && payload.viewerCount !== undefined) {
           const eng = this.state.get("engagement");
