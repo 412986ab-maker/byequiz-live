@@ -1,0 +1,1093 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>لوحة تحكم المسابقة وبث تيك توك المباشر - Bye Bye</title>
+  <link rel="stylesheet" href="/css/style.css" />
+  <style>
+    body {
+      overflow-y: auto;
+      padding: 16px 10px;
+      align-items: flex-start;
+    }
+    .admin-container {
+      width: 100%;
+      max-width: 1050px;
+      margin: 0 auto;
+      background: rgba(14, 28, 44, 0.95);
+      border: 1px solid rgba(45, 212, 191, 0.3);
+      border-radius: 18px;
+      padding: 20px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+    }
+    .admin-title {
+      font-size: 24px;
+      font-weight: 900;
+      color: #2dd4bf;
+      margin-bottom: 18px;
+      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    .admin-tabs {
+      display: flex;
+      gap: 8px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      padding-bottom: 12px;
+      margin-bottom: 18px;
+      overflow-x: auto;
+    }
+    .tab-btn {
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: #94a3b8;
+      padding: 8px 16px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+    .tab-btn:hover { color: #fff; background: rgba(30, 41, 59, 0.8); }
+    .tab-btn.active {
+      background: #0d9488;
+      color: #fff;
+      border-color: #2dd4bf;
+      box-shadow: 0 0 15px rgba(45, 212, 191, 0.3);
+    }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    .section-box {
+      background: rgba(8, 16, 26, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 14px;
+      padding: 14px 16px;
+      margin-bottom: 16px;
+    }
+    .section-title {
+      font-size: 15px;
+      font-weight: 800;
+      color: #38bdf8;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 8px;
+    }
+    .btn {
+      padding: 9px 12px;
+      border: none;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      color: #fff;
+    }
+    .btn:hover { transform: translateY(-2px); filter: brightness(1.15); }
+    .btn:active { transform: translateY(1px); }
+    .btn-teal { background: #0d9488; }
+    .btn-cyan { background: #0284c7; }
+    .btn-amber { background: #d97706; }
+    .btn-rose { background: #e11d48; }
+    .btn-purple { background: #7c3aed; }
+    .btn-dark { background: #334155; }
+    .btn-indigo { background: #4f46e5; }
+    .btn-emerald { background: #059669; }
+
+    .input-field {
+      width: 100%;
+      background: #060e18;
+      border: 1px solid rgba(45, 212, 191, 0.3);
+      padding: 8px 10px;
+      border-radius: 8px;
+      color: #fff;
+      font-size: 13px;
+      outline: none;
+    }
+    .input-field:focus { border-color: #2dd4bf; }
+
+    .settings-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 10px;
+    }
+    .setting-item {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+    .setting-item label {
+      font-size: 11px;
+      font-weight: 700;
+      color: #94a3b8;
+    }
+
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(15, 23, 42, 0.7);
+      padding: 7px 10px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .toggle-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: #e2e8f0;
+    }
+
+    .metrics-bar {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .metric-card {
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      padding: 8px 12px;
+      text-align: center;
+    }
+    .metric-val {
+      font-size: 18px;
+      font-weight: 900;
+      color: #2dd4bf;
+    }
+    .metric-lbl {
+      font-size: 11px;
+      color: #94a3b8;
+      font-weight: 700;
+    }
+
+    /* Questions Table Styles */
+    .table-container {
+      overflow-x: auto;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      margin-top: 10px;
+    }
+    table.q-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      text-align: right;
+    }
+    table.q-table th {
+      background: #0f172a;
+      padding: 10px;
+      color: #38bdf8;
+      font-weight: 800;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    table.q-table td {
+      padding: 9px 10px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      color: #e2e8f0;
+    }
+    table.q-table tr:hover { background: rgba(30, 41, 59, 0.5); }
+
+    /* Modal Styles */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.8);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 999;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.2s ease;
+    }
+    .modal-overlay.active { opacity: 1; pointer-events: auto; }
+    .modal-card {
+      background: #0f172a;
+      border: 1px solid #2dd4bf;
+      border-radius: 16px;
+      width: 90%; max-width: 580px;
+      max-height: 90vh; overflow-y: auto;
+      padding: 20px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.9);
+    }
+
+    .conn-status {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #ef4444;
+      margin-left: 6px;
+    }
+    .conn-status.active { background: #10b981; box-shadow: 0 0 10px #10b981; }
+    .link-box { text-align: center; margin-top: 15px; font-size: 13px; }
+    .link-box a { color: #38bdf8; text-decoration: none; font-weight: 700; }
+  
+    /* Responsive Adaptations for Screen Sizes */
+    @media (max-width: 768px) {
+      body { padding: 6px; }
+      .admin-container { padding: 10px; border-radius: 12px; }
+      .admin-title { font-size: 18px; margin-bottom: 12px; }
+      .section-box { padding: 10px 12px; border-radius: 10px; margin-bottom: 12px; }
+      .btn-grid { grid-template-columns: repeat(auto-fit, minmax(105px, 1fr)); gap: 6px; }
+      .btn { padding: 7px 8px; font-size: 11px; }
+      .settings-grid { grid-template-columns: 1fr; gap: 8px; }
+      .metrics-bar { grid-template-columns: repeat(2, 1fr); gap: 6px; }
+      .modal-card { width: 96%; padding: 14px; max-height: 90vh; }
+      table.q-table th, table.q-table td { padding: 6px 8px; font-size: 11px; }
+      .admin-tabs { gap: 6px; padding-bottom: 8px; }
+      .tab-btn { padding: 6px 12px; font-size: 11px; }
+    }
+    @media (max-width: 480px) {
+      .btn-grid { grid-template-columns: 1fr 1fr; }
+      .metrics-bar { grid-template-columns: 1fr 1fr; }
+      .table-container { font-size: 10px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="admin-container">
+    <h1 class="admin-title">
+       لوحة تحكم مسابقة البث المباشر (Bye Bye)
+    </h1>
+
+    <!-- Navigation Tabs -->
+    <div class="admin-tabs">
+      <button class="tab-btn active" onclick="switchTab('tab-game')">إدارة اللعبة والبث</button>
+      <button class="tab-btn" onclick="switchTab('tab-questions')">بنك الأسئلة والمجموعات</button>
+      <button class="tab-btn" onclick="switchTab('tab-engagement')">التفاعل واللايكات</button>
+      <button class="tab-btn" onclick="switchTab('tab-simulator')">محاكي البث الشامل</button>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- TAB 1: GAME & LIVE CONTROL -->
+    <!-- ========================================== -->
+    <div id="tab-game" class="tab-content active">
+      <!-- TikTok LIVE Connection -->
+      <div class="section-box">
+        <h2 class="section-title">
+           اتصال بث تيك توك المباشر
+          <span class="conn-status" id="tiktok-indicator"></span>
+        </h2>
+        <div style="display: flex; gap: 8px;">
+          <input type="text" id="tiktok-user" class="input-field" placeholder="اسم حساب تيك توك (مثال: @username)" />
+          <button id="btn-connect" class="btn btn-teal" style="min-width: 120px;">اتصال بالبث</button>
+        </div>
+        <div id="conn-msg" style="font-size: 12px; margin-top: 6px; color: var(--text-dim);">
+          الحالة: غير متصل (يمكنك استخدام محاكي البث للتجربة دون فتح بث فعلي)
+        </div>
+      </div>
+
+      <!-- Game Control -->
+      <div class="section-box">
+        <h2 class="section-title"> التحكم باللعبة (GAME CONTROL)</h2>
+        <div class="btn-grid">
+          <button class="btn btn-emerald" onclick="sendCmd('START_ROUND')">بدء جولة جديدة</button>
+          <button class="btn btn-cyan" onclick="sendCmd('NEXT_QUESTION')"> السؤال التالي</button>
+          <button class="btn btn-purple" onclick="sendCmd('END_QUESTION')"> كشف الإجابة</button>
+          <button class="btn btn-amber" onclick="sendCmd('START_DRAW')"> إجراء القرعة</button>
+          <button class="btn btn-amber" onclick="sendCmd('PAUSE_GAME')"> إيقاف مؤقت</button>
+          <button class="btn btn-teal" onclick="sendCmd('RESUME_GAME')"> استئناف</button>
+          <button class="btn btn-dark" onclick="sendCmd('RESET_ROUND')"> إعادة تعيين الجولة</button>
+          <button class="btn btn-rose" onclick="sendCmd('STOP_GAME')"> إيقاف اللعبة</button>
+        </div>
+      </div>
+
+      <!-- Round & Scoring Settings -->
+      <div class="section-box">
+        <h2 class="section-title"> إعدادات الجولة والنقاط</h2>
+        <div class="settings-grid">
+          <div class="setting-item">
+            <label>عدد المشاركين المستهدف:</label>
+            <select id="setting-target" class="input-field" onchange="syncSettings()">
+              <option value="0">مفتوح / غير محدود (الحد الأدنى 1 مشارك)</option>
+              <option value="1">1 مشارك (بدء فوري بمشارك واحد)</option>
+              <option value="2">2 مشاركين</option>
+              <option value="3">3 مشاركين</option>
+              <option value="5">5 مشاركين</option>
+              <option value="10">10 مشاركين</option>
+              <option value="18">18 مشارك</option>
+              <option value="24">24 مشارك</option>
+              <option value="36" selected>36 مشارك (افتراضي)</option>
+              <option value="50">50 مشارك</option>
+              <option value="72">72 مشارك</option>
+              <option value="100">100 مشارك</option>
+            </select>
+          </div>
+          <div class="setting-item">
+            <label>مدة السؤال الافتراضية (ثوانٍ):</label>
+            <select id="setting-q-duration" class="input-field" onchange="syncSettings()">
+              <option value="5">5 ثوانٍ</option>
+              <option value="10">10 ثوانٍ</option>
+              <option value="15" selected>15 ثانية (افتراضي)</option>
+              <option value="20">20 ثانية</option>
+              <option value="30">30 ثانية</option>
+            </select>
+          </div>
+          <div class="setting-item">
+            <label>استراتيجية اختيار الأسئلة:</label>
+            <select id="setting-q-mode" class="input-field" onchange="syncSettings()">
+              <option value="RANDOM" selected>عشوائي ذكي (Smart Random)</option>
+              <option value="DIFFICULTY_CURVE">منحنى الصعوبة التصاعدي (Curve)</option>
+              <option value="CATEGORY">حسب التصنيف المختار</option>
+              <option value="QUESTION_SET">حسب مجموعة الأسئلة المختارة</option>
+              <option value="MIXED">الوضع المختلط بالنسب المئوية</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 8px; margin-top: 10px;">
+          <div class="toggle-row">
+            <span class="toggle-label">الوضع التلقائي (AUTO MODE):</span>
+            <input type="checkbox" id="toggle-auto-mode" checked onchange="syncSettings()" />
+          </div>
+          <div class="toggle-row">
+            <span class="toggle-label">الانتقال التلقائي للجولة التالية:</span>
+            <input type="checkbox" id="toggle-auto-next" checked onchange="syncSettings()" />
+          </div>
+          <div class="toggle-row">
+            <span class="toggle-label">استبعاد الفائز السابق من القرعة:</span>
+            <input type="checkbox" id="toggle-exclude-winner" onchange="syncSettings()" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- TAB 2: QUESTION MANAGER (PHASE 4) -->
+    <!-- ========================================== -->
+    <div id="tab-questions" class="tab-content">
+      <!-- Quick Action Toolbar -->
+      <div class="section-box">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 12px;">
+          <h2 class="section-title" style="margin-bottom: 0;"> بنك الأسئلة وإدارة المجموعات</h2>
+          <div style="display: flex; gap: 6px;">
+            <button class="btn btn-emerald" onclick="openAddQuestionModal()"> إضافة سؤال جديد</button>
+            <button class="btn btn-indigo" onclick="openCustomQuestionModal()">سؤال مباشر للبث</button>
+            <button class="btn btn-dark" onclick="openImportModal()"> استيراد (Import)</button>
+            <button class="btn btn-dark" onclick="exportQuestions('json')"> تصدير JSON</button>
+            <button class="btn btn-dark" onclick="exportQuestions('csv')"> تصدير CSV</button>
+            <button class="btn btn-rose" onclick="resetQuestionHistory()"> تصفير تاريخ الاستخدام</button>
+          </div>
+        </div>
+
+        <!-- Filter Bar -->
+        <div style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 8px; margin-bottom: 10px;">
+          <input type="text" id="q-search" class="input-field" placeholder="بحث في نص السؤال أو الإجابة..." oninput="loadQuestionsTable()" />
+          <select id="q-filter-cat" class="input-field" onchange="loadQuestionsTable()">
+            <option value="">جميع التصنيفات</option>
+          </select>
+          <select id="q-filter-diff" class="input-field" onchange="loadQuestionsTable()">
+            <option value="">جميع الصعوبات</option>
+            <option value="EASY">سهل (Easy)</option>
+            <option value="MEDIUM">متوسط (Medium)</option>
+            <option value="HARD">صعب (Hard)</option>
+            <option value="EXPERT">خبير (Expert)</option>
+          </select>
+          <select id="q-filter-type" class="input-field" onchange="loadQuestionsTable()">
+            <option value="">جميع الأنواع</option>
+            <option value="MULTIPLE_CHOICE">خيارات متعددة</option>
+            <option value="TRUE_FALSE">صح / خطأ</option>
+            <option value="TEXT">نص مفتوح</option>
+            <option value="IMAGE_QUESTION">سؤال بصورة</option>
+            <option value="FASTEST_ANSWER">الأسرع إجابة</option>
+          </select>
+        </div>
+
+        <!-- Questions Table -->
+        <div class="table-container">
+          <table class="q-table" id="questions-table">
+            <thead>
+              <tr>
+                <th>المعرف</th>
+                <th>السؤال</th>
+                <th>التصنيف</th>
+                <th>الصعوبة</th>
+                <th>النوع</th>
+                <th>الإجابة الصحيحة</th>
+                <th>الاستخدام</th>
+                <th>الإجراءات</th>
+              </tr>
+            </thead>
+            <tbody id="questions-table-body">
+              <tr><td colspan="8" style="text-align: center; color: var(--text-dim);">جارٍ تحميل الأسئلة...</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Table Footer Pagination -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
+          <span style="font-size: 12px; color: var(--text-dim);" id="table-count-label">إجمالي الأسئلة: 0</span>
+          <div style="display: flex; gap: 6px;">
+            <button class="btn btn-dark" id="btn-prev-page" onclick="changePage(-1)">السابق</button>
+            <span style="font-size: 12px; font-weight: 800; padding: 6px 12px; color: #2dd4bf;" id="current-page-label">1</span>
+            <button class="btn btn-dark" id="btn-next-page" onclick="changePage(1)">التالي</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- TAB 3: ENGAGEMENT -->
+    <!-- ========================================== -->
+    <div id="tab-engagement" class="tab-content">
+      <div class="section-box">
+        <h2 class="section-title">تفاعل البث المباشر (ENGAGEMENT & LIVE METRICS)</h2>
+        <div class="metrics-bar">
+          <div class="metric-card">
+            <div class="metric-val" id="m-viewers">0</div>
+            <div class="metric-lbl">المشاهدون</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-val" id="m-likes" style="color: #f43f5e;">0</div>
+            <div class="metric-lbl">إجمالي اللايكات</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-val" id="m-shares" style="color: #a855f7;">0</div>
+            <div class="metric-lbl">المشاركات</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-val" id="m-followers" style="color: #ec4899;">0</div>
+            <div class="metric-lbl">المتابعون الجدد</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-val" id="m-diamonds" style="color: #f59e0b;">0</div>
+            <div class="metric-lbl">الماسات</div>
+          </div>
+        </div>
+
+        <div class="settings-grid">
+          <div class="setting-item">
+            <label>كثافة المؤثرات البصرية:</label>
+            <select id="setting-intensity" class="input-field" onchange="syncSettings()">
+              <option value="LOW">خفيفة (LOW)</option>
+              <option value="MEDIUM" selected>متوسطة (MEDIUM)</option>
+              <option value="HIGH">عالية ومكثفة (HIGH)</option>
+            </select>
+          </div>
+          <div class="setting-item">
+            <label>معدل تحويل الماس لنقاط (1 ماسة = X نقطة):</label>
+            <input type="number" id="setting-gift-points-rate" class="input-field" value="1" min="0" onchange="syncSettings()" />
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 8px; margin-top: 10px;">
+          <div class="toggle-row">
+            <span class="toggle-label">تفعيل نظام التفاعل:</span>
+            <input type="checkbox" id="toggle-engagement-on" checked onchange="syncSettings()" />
+          </div>
+          <div class="toggle-row">
+            <span class="toggle-label">المؤثرات الصوتية:</span>
+            <input type="checkbox" id="toggle-engagement-sound" checked onchange="syncSettings()" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- TAB 4: SIMULATOR SUITE -->
+    <!-- ========================================== -->
+    <div id="tab-simulator" class="tab-content">
+      <div class="section-box">
+        <h2 class="section-title"> محاكي تفاعل البث المباشر (SIMULATION SUITE)</h2>
+        
+        <!-- Participants & Answers Sim -->
+        <div style="margin-bottom: 12px;">
+          <div style="font-size: 12px; font-weight: 800; color: #38bdf8; margin-bottom: 6px;">المشتركون والإجابات:</div>
+          <div class="btn-grid">
+            <button class="btn btn-dark" onclick="simulateUsersJoin(6)"> +6 مشاركين</button>
+            <button class="btn btn-dark" onclick="simulateUsersJoin(36)">إكمال 36 مشارك</button>
+            <button class="btn btn-dark" onclick="simulateAnswers(5, true)"> 5 إجابات صحيحة</button>
+            <button class="btn btn-dark" onclick="simulateAnswers(3, false)"> 3 إجابات خاطئة</button>
+          </div>
+        </div>
+
+        <!-- Likes Simulation -->
+        <div style="margin-bottom: 12px;">
+          <div style="font-size: 12px; font-weight: 800; color: #f43f5e; margin-bottom: 6px;">محاكاة اللايكات والإنجازات (Likes & Milestones):</div>
+          <div class="btn-grid">
+            <button class="btn btn-dark" onclick="simulateLikes(100)">+100 لايك</button>
+            <button class="btn btn-dark" onclick="simulateLikes(1000)">+1,000 لايك (Milestone)</button>
+            <button class="btn btn-rose" onclick="simulateLikeJump(9200, 12400)">قفزة: 9,200 → 12,400</button>
+            <button class="btn btn-dark" onclick="simulateLikes(10000)">+10,000 لايك</button>
+          </div>
+        </div>
+
+        <!-- Tiered Gifts Sim -->
+        <div style="margin-bottom: 12px;">
+          <div style="font-size: 12px; font-weight: 800; color: #f59e0b; margin-bottom: 6px;">محاكاة هدايا تيك توك بمستوياتها الخمسة:</div>
+          <div class="btn-grid">
+            <button class="btn btn-teal" onclick="simulateTierGift(1)">Lvl 1: Quantum Blossom (5 Diamonds)</button>
+            <button class="btn btn-cyan" onclick="simulateTierGift(2)">Lvl 2: Plasma Core (50 Diamonds)</button>
+            <button class="btn btn-purple" onclick="simulateTierGift(3)">Lvl 3: Supernova Orb (250 Diamonds)</button>
+            <button class="btn btn-amber" onclick="simulateTierGift(4)">Lvl 4: Sovereign Apex (2000 Diamonds)</button>
+            <button class="btn btn-rose" onclick="simulateTierGift(5)">Lvl 5: Celestial Titan (5000 Diamonds)</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modals -->
+    <!-- 1. Add / Edit Question Modal -->
+    <div id="modal-question" class="modal-overlay">
+      <div class="modal-card">
+        <h3 style="font-size: 16px; font-weight: 900; color: #2dd4bf; margin-bottom: 12px;" id="modal-q-title">إضافة سؤال جديد</h3>
+        <input type="hidden" id="edit-q-id" />
+        
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+          <div>
+            <label style="font-size: 11px; color: #94a3b8; font-weight: 700;">نص السؤال:</label>
+            <input type="text" id="edit-q-text" class="input-field" placeholder="اكتب نص السؤال هنا..." />
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+            <div>
+              <label style="font-size: 11px; color: #94a3b8; font-weight: 700;">التصنيف:</label>
+              <input type="text" id="edit-q-cat" class="input-field" placeholder="ثقافة عامة، جغرافيا..." />
+            </div>
+            <div>
+              <label style="font-size: 11px; color: #94a3b8; font-weight: 700;">الصعوبة:</label>
+              <select id="edit-q-diff" class="input-field">
+                <option value="EASY">سهل (Easy)</option>
+                <option value="MEDIUM" selected>متوسط (Medium)</option>
+                <option value="HARD">صعب (Hard)</option>
+                <option value="EXPERT">خبير (Expert)</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+            <div>
+              <label style="font-size: 11px; color: #94a3b8; font-weight: 700;">نوع السؤال:</label>
+              <select id="edit-q-type" class="input-field" onchange="toggleChoicesInput()">
+                <option value="MULTIPLE_CHOICE" selected>خيارات متعددة (A,B,C,D)</option>
+                <option value="TRUE_FALSE">صح / خطأ</option>
+                <option value="TEXT">نص مفتوح</option>
+                <option value="IMAGE_QUESTION">سؤال بصورة</option>
+                <option value="FASTEST_ANSWER">الأسرع إجابة</option>
+              </select>
+            </div>
+            <div>
+              <label style="font-size: 11px; color: #94a3b8; font-weight: 700;">النقاط:</label>
+              <input type="number" id="edit-q-points" class="input-field" value="100" />
+            </div>
+          </div>
+
+          <div id="choices-container">
+            <label style="font-size: 11px; color: #94a3b8; font-weight: 700;">الخيارات (مفصولة بفاصلة أو 4 أسطر):</label>
+            <input type="text" id="edit-q-options" class="input-field" placeholder="خيار 1, خيار 2, خيار 3, خيار 4" />
+          </div>
+
+          <div>
+            <label style="font-size: 11px; color: #94a3b8; font-weight: 700;">الإجابة الصحيحة:</label>
+            <input type="text" id="edit-q-correct" class="input-field" placeholder="الإجابة الصحيحة المطابقة" />
+          </div>
+
+          <div>
+            <label style="font-size: 11px; color: #94a3b8; font-weight: 700;">الشرح التوضيحي (اختياري):</label>
+            <input type="text" id="edit-q-explanation" class="input-field" placeholder="سبب الإجابة أو معلومة إضافية..." />
+          </div>
+
+          <div>
+            <label style="font-size: 11px; color: #94a3b8; font-weight: 700;">رابط الصورة (اختياري):</label>
+            <input type="text" id="edit-q-image" class="input-field" placeholder="https://..." />
+          </div>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 15px;">
+          <button class="btn btn-dark" onclick="closeModal('modal-question')">إلغاء</button>
+          <button class="btn btn-emerald" onclick="saveQuestion()">حفظ السؤال</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. Custom Live Question Modal -->
+    <div id="modal-custom" class="modal-overlay">
+      <div class="modal-card">
+        <h3 style="font-size: 16px; font-weight: 900; color: #38bdf8; margin-bottom: 12px;">إطلاق سؤال مباشر وفوري للبث</h3>
+        <p style="font-size: 11px; color: var(--text-dim); margin-bottom: 10px;">سيتم إرسال هذا السؤال فوراً إلى شاشة البث الحية:</p>
+        
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          <input type="text" id="custom-q-text" class="input-field" placeholder="نص السؤال المباشر..." />
+          <input type="text" id="custom-q-options" class="input-field" placeholder="الخيارات إن وجدت (مفصولة بفاصلة)..." />
+          <input type="text" id="custom-q-correct" class="input-field" placeholder="الإجابة الصحيحة..." />
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 15px;">
+          <button class="btn btn-dark" onclick="closeModal('modal-custom')">إلغاء</button>
+          <button class="btn btn-indigo" onclick="triggerCustomLiveQuestion()">إطلاق السؤال فوراً</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. Import Modal -->
+    <div id="modal-import" class="modal-overlay">
+      <div class="modal-card">
+        <h3 style="font-size: 16px; font-weight: 900; color: #2dd4bf; margin-bottom: 12px;">استيراد أسئلة (JSON / CSV)</h3>
+        <textarea id="import-content" class="input-field" style="height: 140px; font-family: monospace; font-size: 11px;" placeholder="الصق محتوى JSON أو CSV هنا..."></textarea>
+        
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
+          <label style="font-size: 11px; color: #fff;">
+            <input type="checkbox" id="import-overwrite" /> استبدال البنك الحالي بالكامل
+          </label>
+          <div style="display: flex; gap: 6px;">
+            <button class="btn btn-dark" onclick="closeModal('modal-import')">إلغاء</button>
+            <button class="btn btn-teal" onclick="submitImport()">تنفيذ الاستيراد</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="link-box">
+      <a href="/" target="_blank">فتح شاشة العرض المخصصة لبرنامج OBS / TikTok LIVE Studio (اضغط هنا)</a>
+    </div>
+  </div>
+
+  <script>
+    let questionsData = [];
+    let currentPage = 1;
+    const pageSize = 15;
+    let simTotalLikes = 0;
+    let simTotalShares = 0;
+
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      
+      const targetBtn = Array.from(document.querySelectorAll('.tab-btn')).find(b => b.getAttribute('onclick').includes(tabId));
+      if (targetBtn) targetBtn.classList.add('active');
+      const targetTab = document.getElementById(tabId);
+      if (targetTab) targetTab.classList.add('active');
+
+      if (tabId === 'tab-questions') {
+        loadQuestionsTable();
+      }
+    }
+
+    async function sendCmd(type, payload = {}) {
+      try {
+        await fetch('/api/command', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ type, payload })
+        });
+      } catch (e) {
+        console.error('Command error:', e);
+      }
+    }
+
+    // Load Questions Table with Search & Filters
+    async function loadQuestionsTable() {
+      const search = document.getElementById('q-search').value.trim();
+      const category = document.getElementById('q-filter-cat').value;
+      const difficulty = document.getElementById('q-filter-diff').value;
+      const type = document.getElementById('q-filter-type').value;
+
+      const params = new URLSearchParams({
+        search,
+        category,
+        difficulty,
+        type,
+        page: currentPage,
+        limit: pageSize
+      });
+
+      try {
+        const res = await fetch('/api/questions?' + params.toString());
+        const data = await res.json();
+        questionsData = data.questions || [];
+
+        renderTableRows(questionsData, data.total);
+      } catch (err) {
+        console.error('Failed to load questions:', err);
+      }
+    }
+
+    function renderTableRows(list, total) {
+      const tbody = document.getElementById('questions-table-body');
+      document.getElementById('table-count-label').textContent = `إجمالي الأسئلة: ${total}`;
+      document.getElementById('current-page-label').textContent = currentPage;
+
+      if (!list || list.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; color: var(--text-dim);">لا توجد أسئلة مطابقة للبحث</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = list.map(q => `
+        <tr>
+          <td style="font-family: monospace; color: #38bdf8;">${q.id}</td>
+          <td style="font-weight: 700;">${q.question}</td>
+          <td><span style="background: rgba(45, 212, 191, 0.15); color: #2dd4bf; padding: 2px 6px; border-radius: 4px; font-size: 11px;">${q.category}</span></td>
+          <td>${q.difficulty}</td>
+          <td>${q.type}</td>
+          <td style="color: #10b981; font-weight: 800;">${q.correctAnswer}</td>
+          <td>${q.usageCount || 0}</td>
+          <td>
+            <div style="display: flex; gap: 4px;">
+              <button class="btn btn-teal" style="padding: 4px 8px; font-size: 11px;" onclick="openEditQuestionModal('${q.id}')">تعديل</button>
+              <button class="btn btn-rose" style="padding: 4px 8px; font-size: 11px;" onclick="deleteQuestion('${q.id}')">حذف</button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function changePage(delta) {
+      currentPage = Math.max(1, currentPage + delta);
+      loadQuestionsTable();
+    }
+
+    function openAddQuestionModal() {
+      document.getElementById('modal-q-title').textContent = 'إضافة سؤال جديد';
+      document.getElementById('edit-q-id').value = '';
+      document.getElementById('edit-q-text').value = '';
+      document.getElementById('edit-q-cat').value = 'ثقافة عامة';
+      document.getElementById('edit-q-diff').value = 'MEDIUM';
+      document.getElementById('edit-q-type').value = 'MULTIPLE_CHOICE';
+      document.getElementById('edit-q-points').value = '100';
+      document.getElementById('edit-q-options').value = '';
+      document.getElementById('edit-q-correct').value = '';
+      document.getElementById('edit-q-explanation').value = '';
+      document.getElementById('edit-q-image').value = '';
+
+      document.getElementById('modal-question').classList.add('active');
+    }
+
+    function openEditQuestionModal(id) {
+      const q = questionsData.find(item => item.id.toString() === id.toString());
+      if (!q) return;
+
+      document.getElementById('modal-q-title').textContent = 'تعديل السؤال';
+      document.getElementById('edit-q-id').value = q.id;
+      document.getElementById('edit-q-text').value = q.question;
+      document.getElementById('edit-q-cat').value = q.category;
+      document.getElementById('edit-q-diff').value = q.difficulty || 'MEDIUM';
+      document.getElementById('edit-q-type').value = q.type || 'MULTIPLE_CHOICE';
+      document.getElementById('edit-q-points').value = q.points || 100;
+      document.getElementById('edit-q-options').value = Array.isArray(q.options) ? q.options.join(', ') : '';
+      document.getElementById('edit-q-correct').value = q.correctAnswer;
+      document.getElementById('edit-q-explanation').value = q.explanation || '';
+      document.getElementById('edit-q-image').value = q.image || '';
+
+      document.getElementById('modal-question').classList.add('active');
+    }
+
+    async function saveQuestion() {
+      const id = document.getElementById('edit-q-id').value;
+      const question = document.getElementById('edit-q-text').value.trim();
+      const category = document.getElementById('edit-q-cat').value.trim();
+      const difficulty = document.getElementById('edit-q-diff').value;
+      const type = document.getElementById('edit-q-type').value;
+      const points = parseInt(document.getElementById('edit-q-points').value, 10) || 100;
+      const optionsRaw = document.getElementById('edit-q-options').value.trim();
+      const options = optionsRaw ? optionsRaw.split(',').map(o => o.trim()).filter(Boolean) : [];
+      const correctAnswer = document.getElementById('edit-q-correct').value.trim();
+      const explanation = document.getElementById('edit-q-explanation').value.trim();
+      const image = document.getElementById('edit-q-image').value.trim();
+
+      if (!question || !category || !correctAnswer) {
+        return alert('يرجى ملء نص السؤال والتصنيف والإجابة الصحيحة');
+      }
+
+      const payload = {
+        question,
+        category,
+        difficulty,
+        type,
+        points,
+        options,
+        answers: [correctAnswer],
+        correctAnswer,
+        explanation,
+        image
+      };
+
+      try {
+        if (id) {
+          // Update
+          await fetch('/api/questions/' + id, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+        } else {
+          // Create
+          await fetch('/api/questions', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+        }
+        closeModal('modal-question');
+        loadQuestionsTable();
+      } catch (err) {
+        alert('خطأ في حفظ السؤال: ' + err.message);
+      }
+    }
+
+    async function deleteQuestion(id) {
+      if (!confirm('هل أنت متأكد من حذف هذا السؤال نهائياً؟')) return;
+      try {
+        await fetch('/api/questions/' + id, { method: 'DELETE' });
+        loadQuestionsTable();
+      } catch (err) {
+        alert('خطأ في حذف السؤال');
+      }
+    }
+
+    function openCustomQuestionModal() {
+      document.getElementById('modal-custom').classList.add('active');
+    }
+
+    async function triggerCustomLiveQuestion() {
+      const question = document.getElementById('custom-q-text').value.trim();
+      const optionsRaw = document.getElementById('custom-q-options').value.trim();
+      const options = optionsRaw ? optionsRaw.split(',').map(o => o.trim()).filter(Boolean) : [];
+      const correctAnswer = document.getElementById('custom-q-correct').value.trim();
+
+      if (!question || !correctAnswer) {
+        return alert('يرجى كتابة السؤال والإجابة الصحيحة');
+      }
+
+      try {
+        await fetch('/api/questions/custom', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ question, options, correctAnswer })
+        });
+        closeModal('modal-custom');
+        alert('تم إطلاق السؤال المباشر في البث بنجاح!');
+      } catch (err) {
+        alert('خطأ في إطلاق السؤال المباشر');
+      }
+    }
+
+    function openImportModal() {
+      document.getElementById('modal-import').classList.add('active');
+    }
+
+    async function submitImport() {
+      const content = document.getElementById('import-content').value.trim();
+      const overwrite = document.getElementById('import-overwrite').checked;
+      if (!content) return alert('الرجاء لصق محتوى الاستيراد');
+
+      const format = content.startsWith('[') || content.startsWith('{') ? 'json' : 'csv';
+
+      try {
+        const res = await fetch('/api/questions/import', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ format, content, overwrite })
+        });
+        const data = await res.json();
+        if (data.success) {
+          alert(`تم استيراد ${data.count} سؤال بنجاح!`);
+          closeModal('modal-import');
+          loadQuestionsTable();
+        } else {
+          alert('خطأ: ' + data.error);
+        }
+      } catch (e) {
+        alert('خطأ في معالجة الاستيراد');
+      }
+    }
+
+    function exportQuestions(format = 'json') {
+      window.open('/api/questions/export?format=' + format, '_blank');
+    }
+
+    function resetQuestionHistory() {
+      if (confirm('هل تريد تصفير سجل الأسئلة المستخدمة في هذه الجلسة؟')) {
+        sendCmd('RESET_QUESTION_HISTORY');
+        alert('تم تصفير سجل الأسئلة المستخدمة');
+      }
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).classList.remove('active');
+    }
+
+    function toggleChoicesInput() {
+      const type = document.getElementById('edit-q-type').value;
+      const box = document.getElementById('choices-container');
+      box.style.display = (type === 'MULTIPLE_CHOICE' || type === 'IMAGE_QUESTION') ? 'block' : 'none';
+    }
+
+    function syncSettings() {
+      const targetParticipants = parseInt(document.getElementById('setting-target').value, 10);
+      const questionDuration = parseInt(document.getElementById('setting-q-duration').value, 10);
+      const questionSelectionMode = document.getElementById('setting-q-mode').value;
+      const autoMode = document.getElementById('toggle-auto-mode').checked;
+      const autoNextRound = document.getElementById('toggle-auto-next').checked;
+      const excludePreviousWinner = document.getElementById('toggle-exclude-winner').checked;
+      const engagementEnabled = document.getElementById('toggle-engagement-on').checked;
+      const engagementSound = document.getElementById('toggle-engagement-sound').checked;
+      const engagementIntensity = document.getElementById('setting-intensity').value;
+      const giftPointsRate = parseFloat(document.getElementById('setting-gift-points-rate').value) || 1;
+
+      sendCmd('UPDATE_SETTINGS', {
+        targetParticipants,
+        questionDuration,
+        questionSelectionMode,
+        autoMode,
+        autoTransition: autoMode,
+        autoNextRound,
+        excludePreviousWinner,
+        engagementEnabled,
+        engagementSound,
+        engagementIntensity,
+        giftPointsRate
+      });
+    }
+
+    // Connect to TikTok Live
+    document.getElementById('btn-connect').addEventListener('click', async () => {
+      const username = document.getElementById('tiktok-user').value.trim().replace('@', '');
+      if (!username) return alert('الرجاء إدخال اسم المستخدم لحساب تيك توك');
+
+      document.getElementById('conn-msg').textContent = 'جارٍ الاتصال بالبث المباشر...';
+      try {
+        const res = await fetch('/api/connect-tiktok', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username })
+        });
+        const data = await res.json();
+        if (data.success) {
+          document.getElementById('tiktok-indicator').classList.add('active');
+          document.getElementById('conn-msg').textContent = 'متصل بنجاح مع البث المباشر: @' + username;
+        } else {
+          document.getElementById('conn-msg').textContent = 'تعذر الاتصال: ' + (data.message || 'تأكد من أن الحساب يبث حالياً');
+        }
+      } catch (err) {
+        document.getElementById('conn-msg').textContent = 'خطأ في الاتصال بالخادم';
+      }
+    });
+
+    // Mock Simulation Helpers
+    const mockNames = [
+      'سارة العتيبي', 'محمد القحطاني', 'نورة الشمري', 'أحمد المصري', 'خالد الدوسري',
+      'ريم العبدالله', 'عمر الحربي', 'فاطمة الزهراء', 'ياسين الجزائري', 'طارق التونسي',
+      'مها الصالح', 'سلطان الغامدي', 'منى الشريف', 'فيصل العنزي', 'هدى التميمي'
+    ];
+
+    function getRandomUser() {
+      const name = mockNames[Math.floor(Math.random() * mockNames.length)];
+      const id = 'mock_' + Math.random().toString(36).substring(5);
+      const avatar = 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + encodeURIComponent(name);
+      return { id, uniqueId: id, nickname: name, displayName: name, avatar };
+    }
+
+    function simulateUsersJoin(count = 5) {
+      for (let i = 0; i < count; i++) {
+        const u = getRandomUser();
+        sendCmd('CHAT', { ...u, comment: 'تم' });
+      }
+    }
+
+    function simulateAnswers(count = 3, isCorrect = true) {
+      const answers = isCorrect 
+        ? ['دمشق', 'السعودية', 'الارجنتين', 'طوكيو', 'نهر النيل', '144', 'الفاتحة', 'سورة البقرة', 'المشتري']
+        : ['باريس', 'لندن', 'مدريد', 'روما', 'برلين'];
+
+      for (let i = 0; i < count; i++) {
+        const u = getRandomUser();
+        const comment = answers[Math.floor(Math.random() * answers.length)];
+        setTimeout(() => {
+          sendCmd('CHAT', { ...u, comment });
+        }, i * 350);
+      }
+    }
+
+    function simulateLikes(count = 100) {
+      simTotalLikes += count;
+      sendCmd('LIKE', { likeCount: count, totalLikeCount: simTotalLikes });
+    }
+
+    function simulateLikeJump(fromVal = 9200, toVal = 12400) {
+      simTotalLikes = fromVal;
+      sendCmd('LIKE', { likeCount: 1, totalLikeCount: fromVal });
+      setTimeout(() => {
+        simTotalLikes = toVal;
+        sendCmd('LIKE', { likeCount: toVal - fromVal, totalLikeCount: toVal });
+      }, 500);
+    }
+
+    function simulateTierGift(level = 1) {
+      const u = getRandomUser();
+      const gifts = [
+        { name: 'Quantum Blossom', diamonds: 5 },
+        { name: 'Plasma Core', diamonds: 50 },
+        { name: 'Supernova Orb', diamonds: 250 },
+        { name: 'Sovereign Apex', diamonds: 2000 },
+        { name: 'Celestial Titan', diamonds: 5000 }
+      ];
+      const g = gifts[level - 1] || gifts[0];
+
+      sendCmd('GIFT', {
+        ...u,
+        giftName: g.name,
+        giftCount: 1,
+        diamondCount: g.diamonds,
+        diamonds: g.diamonds
+      });
+    }
+
+    // Initialize Questions on startup
+    
+    // Real-time EventSource listener for Admin Dashboard
+    function initAdminSSE() {
+      if (typeof EventSource === "undefined") return;
+      const sse = new EventSource("/api/events");
+      sse.onmessage = (event) => {
+        try {
+          const msg = JSON.parse(event.data);
+          if (msg.type === "INIT_SNAPSHOT" && msg.payload && msg.payload.tiktok) {
+            updateAdminTikTokStatus(msg.payload.tiktok);
+          } else if (msg.type === "TIKTOK_STATUS" && msg.payload) {
+            updateAdminTikTokStatus(msg.payload);
+          } else if (msg.type === "STREAM_START") {
+            updateAdminTikTokStatus({ status: "CONNECTED", username: msg.payload && msg.payload.username });
+          } else if (msg.type === "STREAM_END" || msg.type === "DISCONNECT") {
+            updateAdminTikTokStatus({ status: "OFFLINE" });
+          }
+        } catch (e) {}
+      };
+    }
+
+    function updateAdminTikTokStatus(data) {
+      const ind = document.getElementById("tiktok-indicator");
+      const msg = document.getElementById("conn-msg");
+      if (!ind) return;
+
+      if (data.status === "CONNECTED") {
+        ind.classList.add("active");
+        if (msg) msg.textContent = "متصل بنجاح مع البث المباشر: @" + (data.username || "");
+      } else if (data.status === "CONNECTING" || data.status === "RECONNECTING") {
+        ind.classList.remove("active");
+        if (msg) msg.textContent = "جارٍ الاتصال بالبث المباشر...";
+      } else {
+        ind.classList.remove("active");
+        if (msg && data.lastError) msg.textContent = "غير متصل: " + data.lastError;
+      }
+    }
+
+    // Initialize Questions and SSE on startup
+    loadQuestionsTable();
+    initAdminSSE();
+  </script>
+</body>
+</html>

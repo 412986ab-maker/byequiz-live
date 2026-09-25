@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#030712" />
+  <title>BYE QUIZ LIVE - Broadcast Screen (OBS / Studio Overlay)</title>
+  
+  <link rel="stylesheet" href="/css/style.css" />
+  <style>
+    /* Specific overrides for OBS studio zero-admin overlay */
+    body {
+      background: #030712 !important;
+      overflow: hidden;
+      margin: 0;
+      padding: 0;
+    }
+    .hud-actions, .pwa-install-prompt {
+      display: none !important;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="stream-container" id="main-stream-container">
+    <canvas id="confetti-canvas"></canvas>
+
+    <!-- Global Top Unified HUD -->
+    <header class="global-top-hud">
+      <!-- Brand & Status Row -->
+      <div class="brand-row">
+        <div class="brand-badge" id="brand-badge-logo" onclick="handleBrandSecretClick()" title="BYE QUIZ">
+          <span class="brand-name">BYE QUIZ</span>
+          <span class="live-pill-tag" id="live-status-pill">
+            <svg class="icon-svg icon-live" width="10" height="10" viewBox="0 0 24 24" fill="currentColor">
+              <circle cx="12" cy="12" r="8" />
+            </svg>
+            LIVE
+          </span>
+        </div>
+      </div>
+
+      <!-- Live Engagement Metric Chips -->
+      <div class="top-engagement-bar">
+        <div class="engagement-pill view-pill">
+          <svg class="icon-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--cyber-cyan)" stroke-width="2">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" />
+          </svg>
+          <span id="val-viewers">0</span>
+        </div>
+        <div class="engagement-pill like-pill">
+          <svg class="icon-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--neon-magenta)" stroke-width="2">
+            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" fill="var(--neon-magenta)" fill-opacity="0.3"/>
+          </svg>
+          <span id="val-likes">0</span>
+        </div>
+        <div class="engagement-pill share-pill">
+          <svg class="icon-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--electric-purple)" stroke-width="2">
+            <circle cx="18" cy="5" r="3" /><circle cx="6" cy="12" r="3" /><circle cx="18" cy="19" r="3" />
+            <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" /><line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
+          </svg>
+          <span id="val-shares">0</span>
+        </div>
+        <div class="engagement-pill gift-pill">
+          <svg class="icon-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--luxury-gold)" stroke-width="2">
+            <path d="M6 3h12l4 6-10 12L2 9z" /><path d="M11 3L8 9l4 12 4-12-3-6" />
+          </svg>
+          <span id="val-diamonds">0</span>
+        </div>
+      </div>
+
+      <!-- Header Category & Ring Timer Bar -->
+      <div class="header-bar">
+        <div class="category-badge" id="header-category">
+          <span>مسابقة تيك توك المباشرة</span>
+        </div>
+
+        <!-- Circular Ring Timer -->
+        <div class="timer-container" id="timer-container" style="visibility: hidden;">
+          <svg class="timer-svg" viewBox="0 0 70 70">
+            <circle class="timer-circle-bg" cx="35" cy="35" r="30" />
+            <circle class="timer-circle-bar" id="timer-bar" cx="35" cy="35" r="30" />
+          </svg>
+          <span class="timer-text" id="timer-text">15</span>
+        </div>
+
+        <!-- Stats Pill -->
+        <div class="top-stats">
+          <div class="stat-pill">
+            <div class="num" id="val-round">ROUND 01</div>
+          </div>
+          <div class="stat-pill">
+            <div class="num" id="stat-participants">0</div>
+            <div class="label">مشارك</div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Dynamic Stage Area -->
+    <main class="stage-area" id="stage-area">
+      <!-- Injected dynamically by SceneManager -->
+    </main>
+
+    <!-- Persistent Bottom Leaderboard Preview -->
+    <footer class="footer-leaderboard">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+        <span style="font-size: 11px; font-weight: 800; color: var(--cyber-cyan); display:flex; align-items:center; gap:4px;">
+          <svg class="icon-svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="20" x2="18" y2="10" /><line x1="12" y1="20" x2="12" y2="4" /><line x1="6" y1="20" x2="6" y2="14" />
+          </svg>
+          لوحة الصدارة المباشرة
+        </span>
+      </div>
+      <div class="leaderboard-items" id="footer-leaderboard-items">
+        <div style="color: var(--text-dim); text-align: center; font-size: 11px; width: 100%;">في انتظار المتصدرين...</div>
+      </div>
+      <div class="streamer-notice">
+        اكتب <b>!join</b> أو <b>!answer</b> في الشات للتفاعل فوراً مع البث
+      </div>
+    </footer>
+  </div>
+
+  <!-- Audio Synthesizer & Fireworks FX -->
+  <script src="/js/audio.js"></script>
+  <script src="/js/engine/reactionCanvas.js"></script>
+
+  <!-- Vector Icon System -->
+  <script src="/js/engine/iconSystem.js"></script>
+
+  <!-- Modular Game Engine Subsystems -->
+  <script src="/js/engine/eventManager.js"></script>
+  <script src="/js/engine/gameState.js"></script>
+  <script src="/js/engine/questionModel.js"></script>
+  <script src="/js/engine/questionValidator.js"></script>
+  <script src="/js/engine/questionSelector.js"></script>
+  <script src="/js/engine/participantCard.js"></script>
+  <script src="/js/engine/participantManager.js"></script>
+  <script src="/js/engine/questionEngine.js"></script>
+  <script src="/js/engine/answerEngine.js"></script>
+  <script src="/js/engine/drawEngine.js"></script>
+  <script src="/js/engine/scoreEngine.js"></script>
+  <script src="/js/engine/statisticsEngine.js"></script>
+  <script src="/js/engine/reactionEngine.js"></script>
+  <script src="/js/engine/milestoneEngine.js"></script>
+  <script src="/js/engine/reactionAggregator.js"></script>
+  <script src="/js/engine/reactionQueue.js"></script>
+  <script src="/js/engine/giftEventEngine.js"></script>
+  <script src="/js/engine/effectManager.js"></script>
+  <script src="/js/engine/sceneManager.js"></script>
+  <script src="/js/engine/roundManager.js"></script>
+  <script src="/js/engine/gameEngine.js"></script>
+
+  <!-- Main Game Entry Point -->
+  <script src="/js/game.js"></script>
+  <script>
+    let brandClicks = 0;
+    let brandTimer = null;
+    function handleBrandSecretClick() {
+      brandClicks++;
+      clearTimeout(brandTimer);
+      brandTimer = setTimeout(() => { brandClicks = 0; }, 1000);
+      if (brandClicks >= 3) {
+        brandClicks = 0;
+        window.location.href = '/admin';
+      }
+    }
+  </script>
+</body>
+</html>

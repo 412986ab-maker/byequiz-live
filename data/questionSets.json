@@ -1,0 +1,141 @@
+[
+  {
+    "id": "set_ramadan_islamic",
+    "title": "مسابقة الإسلاميات والقرآن الكريم والسيرة",
+    "description": "أسئلة مخصصة في علوم القرآن والسيرة النبوية والصحابة وأركان الإسلام",
+    "category": "إسلاميات",
+    "questionIds": [
+      "q_isl_01",
+      "q_isl_02",
+      "q_isl_03",
+      "q_isl_04",
+      "q_isl_05",
+      "q_isl_06",
+      "q_isl_07",
+      "q_isl_08",
+      "q_isl_09",
+      "q_isl_10"
+    ]
+  },
+  {
+    "id": "set_world_geography",
+    "title": "تحدي جغرافيا العالم والأعلام والقارات",
+    "description": "رحلة حول العالم في العواصم، القمم الجبلية، الأنهار والبحار",
+    "category": "جغرافيا",
+    "questionIds": [
+      "q_geo_01",
+      "q_geo_02",
+      "q_geo_03",
+      "q_geo_04",
+      "q_geo_05",
+      "q_geo_06",
+      "q_geo_07",
+      "q_geo_08",
+      "q_geo_09",
+      "q_geo_10"
+    ]
+  },
+  {
+    "id": "set_arab_world",
+    "title": "تحدي العواصم والمعالم وتاريخ العالم العربي",
+    "description": "تاريخ عريق ومعالم بارزة في بلاد الشام ومصر والخليج والمغرب العربي",
+    "category": "العالم العربي",
+    "questionIds": [
+      "q_arab_01",
+      "q_arab_02",
+      "q_arab_03",
+      "q_arab_04",
+      "q_arab_05",
+      "q_geo_07",
+      "q_geo_09"
+    ]
+  },
+  {
+    "id": "set_science_nature",
+    "title": "تحدي العلوم والكون والطبيعة والأحياء",
+    "description": "حقائق مدهشة في الفيزياء، الفلك، الكيمياء وجسم الإنسان",
+    "category": "علوم",
+    "questionIds": [
+      "q_sci_01",
+      "q_sci_02",
+      "q_sci_03",
+      "q_sci_04",
+      "q_sci_05",
+      "q_sci_06"
+    ]
+  },
+  {
+    "id": "set_tech_modern",
+    "title": "تحدي التكنولوجيا والذكاء الاصطناعي والإنترنت",
+    "description": "أسئلة العصر الرقمي في الحواسيب، البرمجة، والذكاء الاصطناعي",
+    "category": "تكنولوجيا",
+    "questionIds": [
+      "q_tech_01",
+      "q_tech_02",
+      "q_tech_03",
+      "q_tech_04"
+    ]
+  },
+  {
+    "id": "set_sports_football",
+    "title": "تحدي الرياضة وكرة القدم العالمية والمونديال",
+    "description": "تحدي عشاق الساحرة المستديرة، دوري الأبطال، وكأس العالم والأولمبياد",
+    "category": "رياضة",
+    "questionIds": [
+      "q_spo_01",
+      "q_spo_02",
+      "q_spo_03",
+      "q_spo_04",
+      "q_spo_05"
+    ]
+  },
+  {
+    "id": "set_general_culture",
+    "title": "تحدي الثقافة العامة والأدب واللغة العربية",
+    "description": "باقة ثقافية مميزة في اللغة، الشعر، الاختراعات، وجوائز نوبل",
+    "category": "ثقافة عامة",
+    "questionIds": [
+      "q_gen_01",
+      "q_gen_02",
+      "q_gen_03",
+      "q_gen_04",
+      "q_gen_05"
+    ]
+  },
+  {
+    "id": "set_iq_riddles",
+    "title": "تحدي الألغاز والرياضيات وسرعة البديهة",
+    "description": "اختبار الذكاء والمنطق والحساب الذهني السريع للعباقرة",
+    "category": "ذكاء",
+    "questionIds": [
+      "q_iq_01",
+      "q_iq_02",
+      "q_iq_03",
+      "q_iq_04"
+    ]
+  },
+  {
+    "id": "set_champions_ultimate",
+    "title": "التحدي الشامل للعباقرة (Super Quiz)",
+    "description": "المسابقة الكبرى الجامعة لكافة التخصصات والمستويات للمحترفين",
+    "category": "شامل",
+    "questionIds": [
+      "q_isl_01",
+      "q_isl_03",
+      "q_geo_01",
+      "q_geo_03",
+      "q_arab_01",
+      "q_arab_03",
+      "q_sci_01",
+      "q_sci_03",
+      "q_tech_01",
+      "q_tech_04",
+      "q_spo_01",
+      "q_spo_04",
+      "q_gen_01",
+      "q_gen_02",
+      "q_iq_01",
+      "q_iq_04"
+    ]
+  }
+]

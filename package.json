@@ -1,0 +1,18 @@
+{
+  "name": "tiktok-live-interactive-game",
+  "version": "2.0.0",
+  "description": "Bye Bye - Professional TikTok LIVE Interactive Game Show Platform",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node test_production_phase6.mjs && node test_production_integration.mjs",
+    "check": "node -c server.js && for f in public/js/engine/*.js lib/*.js; do node -c \"$f\"; done",
+    "build": "echo 'Build complete - Zero build step required for ES Modules'",
+    "migrate": "echo 'PostgreSQL schema ready in migrations/001_initial_schema.sql'"
+  },
+  "dependencies": {
+    "tiktok-live-connector": "^1.1.8",
+    "pg": "^8.11.5"
+  }
+}

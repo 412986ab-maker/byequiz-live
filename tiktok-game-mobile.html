@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>اللعبة التفاعلية الحية للبث المباشر</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap');
+    :root {
+      --bg-primary: #070d17;
+      --bg-card: rgba(14, 28, 44, 0.95);
+      --neon-teal: #14b8a6;
+      --neon-cyan: #06b6d4;
+      --neon-gold: #f59e0b;
+      --neon-emerald: #10b981;
+      --neon-pink: #ec4899;
+      --text-main: #f8fafc;
+      --text-dim: #94a3b8;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Tajawal', sans-serif; user-select: none; }
+    body {
+      background: radial-gradient(circle at top center, #0f273d 0%, #08131d 50%, #03080e 100%);
+      color: var(--text-main); min-height: 100vh; display: flex; justify-content: center; align-items: flex-start; direction: rtl;
+      padding: 10px 6px 90px 6px;
+    }
+    .stream-container {
+      width: 100%; max-width: 480px; min-height: 85vh;
+      background: radial-gradient(circle at 50% 20%, rgba(20, 184, 166, 0.12) 0%, transparent 60%), #070d17;
+      position: relative; display: flex; flex-direction: column; justify-content: space-between; padding: 12px 10px;
+      border-radius: 18px; border: 1px solid rgba(45, 212, 191, 0.2); box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+    }
+    
+    /* Top Floating Streamer Toolbar */
+    .top-toolbar {
+      background: rgba(15, 23, 42, 0.95);
+      border: 1px solid var(--neon-teal);
+      border-radius: 14px;
+      padding: 6px 8px;
+      display: flex;
+      gap: 6px;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+    }
+    .btn-action {
+      padding: 6px 10px;
+      font-size: 11px;
+      font-weight: 800;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      color: #fff;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: transform 0.1s;
+    }
+    .btn-action:active { transform: scale(0.95); }
+    .btn-teal { background: #0d9488; }
+    .btn-cyan { background: #0284c7; }
+    .btn-amber { background: #d97706; }
+    .btn-pink { background: #db2777; }
+
+    .header-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    .category-badge { background: rgba(20, 184, 166, 0.2); border: 1px solid var(--neon-teal); color: #5eead4; padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; }
+    .top-stats { display: flex; gap: 6px; }
+    .stat-pill { background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 10px; padding: 3px 8px; text-align: center; min-width: 46px; }
+    .stat-pill .num { font-size: 13px; font-weight: 900; color: #38bdf8; }
+    .stat-pill .label { font-size: 9px; color: var(--text-dim); }
+
+    .timer-container { position: relative; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; }
+    .timer-svg { transform: rotate(-90deg); width: 100%; height: 100%; }
+    .timer-circle-bg { fill: none; stroke: rgba(255, 255, 255, 0.08); stroke-width: 5; }
+    .timer-circle-bar { fill: none; stroke: var(--neon-cyan); stroke-width: 5; stroke-linecap: round; stroke-dasharray: 125.6; stroke-dashoffset: 0; transition: stroke-dashoffset 1s linear; }
+    .timer-text { position: absolute; font-size: 15px; font-weight: 900; color: #fff; }
+
+    .glass-panel {
+      background: var(--bg-card); backdrop-filter: blur(16px);
+      border: 1px solid rgba(45, 212, 191, 0.3); border-radius: 16px; box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+    }
+    .stage-area { flex: 1; display: flex; flex-direction: column; justify-content: center; position: relative; z-index: 5; min-height: 320px; margin-bottom: 10px; }
+    
+    .question-card { text-align: center; padding: 14px 10px; }
+    .question-icon { font-size: 36px; margin-bottom: 6px; }
+    .question-title { font-size: 19px; font-weight: 800; color: #fff; margin-bottom: 10px; line-height: 1.4; text-shadow: 0 2px 8px rgba(0,0,0,0.8); }
+    .question-image-box { width: 100%; max-width: 260px; height: 145px; margin: 0 auto 10px auto; border-radius: 12px; overflow: hidden; border: 2px solid rgba(255, 255, 255, 0.15); display: flex; align-items: center; justify-content: center; background: #0b1522; }
+    .question-image-box img { width: 100%; height: 100%; object-fit: cover; }
+    .cta-banner { background: linear-gradient(90deg, rgba(6, 182, 212, 0.2), rgba(20, 184, 166, 0.25)); border: 1px solid var(--neon-teal); border-radius: 20px; padding: 5px 12px; display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; color: #67e8f9; }
+
+    .participants-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; padding: 8px; max-height: 240px; overflow-y: auto; border-radius: 12px; background: rgba(10, 21, 33, 0.6); }
+    .user-avatar-bubble { width: 40px; height: 40px; border-radius: 50%; border: 2px solid rgba(255, 255, 255, 0.3); overflow: hidden; transition: all 0.3s ease; animation: popIn 0.3s ease; }
+    .user-avatar-bubble img { width: 100%; height: 100%; object-fit: cover; }
+    .user-avatar-bubble.highlighted { border-color: #f59e0b; transform: scale(1.25); box-shadow: 0 0 15px #f59e0b; }
+
+    .winner-spotlight { background: linear-gradient(135deg, rgba(20, 184, 166, 0.3), rgba(245, 158, 11, 0.2)); border: 2px solid var(--neon-gold); border-radius: 18px; padding: 18px; text-align: center; }
+    .winner-spotlight .winner-avatar { width: 75px; height: 75px; border-radius: 50%; border: 3px solid var(--neon-gold); margin: 0 auto 8px auto; overflow: hidden; box-shadow: 0 0 20px rgba(245,158,11,0.6); }
+    .winner-spotlight .winner-avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+    /* Interactive Live Chat Input on Screen */
+    .interactive-input-box {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 8px;
+    }
+    .chat-input {
+      flex: 1;
+      background: rgba(10, 20, 32, 0.9);
+      border: 1px solid rgba(45, 212, 191, 0.4);
+      border-radius: 10px;
+      padding: 8px 12px;
+      color: #fff;
+      font-size: 13px;
+      outline: none;
+    }
+    .chat-input:focus { border-color: var(--neon-teal); }
+    .send-btn {
+      background: var(--neon-teal);
+      border: none;
+      border-radius: 10px;
+      color: #070d17;
+      font-weight: 900;
+      padding: 0 14px;
+      cursor: pointer;
+      font-size: 13px;
+    }
+
+    .footer-leaderboard { background: rgba(10, 20, 32, 0.9); border-radius: 12px; padding: 6px 10px; border: 1px solid rgba(255,255,255,0.08); }
+    .lb-row { display: flex; align-items: center; justify-content: space-between; font-size: 11px; margin-top: 3px; }
+    .lb-user { display: flex; align-items: center; gap: 5px; }
+    .lb-user img { width: 18px; height: 18px; border-radius: 50%; }
+
+    #confetti-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 100; }
+    @keyframes popIn { 0% { transform: scale(0); } 100% { transform: scale(1); } }
+  </style>
+</head>
+<body>
+
+  <div class="stream-container">
+    <canvas id="confetti-canvas"></canvas>
+
+    <!-- 1. Top Floating Streamer Toolbar (دائماً في أعلى الشاشة لا يغطيه أي شيء) -->
+    <div class="top-toolbar">
+      <button class="btn-action btn-teal" onclick="game.setMode('DRAW')">🎁 قرعة</button>
+      <button class="btn-action btn-cyan" onclick="game.nextQuestion()">❓ سؤال جديد</button>
+      <button class="btn-action btn-amber" onclick="game.drawWinner()">🎲 سحب فائز</button>
+      <button class="btn-action btn-pink" id="auto-btn" onclick="game.toggleAutoPlay()">⚡ تفاعل تلقائي</button>
+    </div>
+
+    <!-- 2. Header Bar -->
+    <header class="header-bar">
+      <div class="category-badge" id="header-category">السحب والقرعة 🎁</div>
+      <div class="timer-container" id="timer-container" style="visibility: hidden;">
+        <svg class="timer-svg" viewBox="0 0 48 48">
+          <circle class="timer-circle-bg" cx="24" cy="24" r="20" />
+          <circle class="timer-circle-bar" id="timer-bar" cx="24" cy="24" r="20" />
+        </svg>
+        <span class="timer-text" id="timer-text">15</span>
+      </div>
+      <div class="top-stats">
+        <div class="stat-pill"><div class="num" id="stat-answered">0</div><div class="label">أجابوا</div></div>
+        <div class="stat-pill"><div class="num" id="stat-participants">0</div><div class="label">مشارك</div></div>
+      </div>
+    </header>
+
+    <!-- 3. Stage Area (القرعة والأسئلة) -->
+    <main class="stage-area" id="stage-area"></main>
+
+    <!-- 4. Interactive Live Chat Input (اكتب إجابتك أو "تم" هنا لتجربة التفاعل الفوري!) -->
+    <div class="interactive-input-box">
+      <input type="text" id="user-input" class="chat-input" placeholder="اكتب 'تم' للدخول في القرعة أو اكتب الإجابة..." />
+      <button class="send-btn" onclick="game.submitFromInput()">إرسال</button>
+    </div>
+
+    <!-- 5. Leaderboard (لوحة الصدارة) -->
+    <footer class="footer-leaderboard">
+      <div style="display: flex; justify-content: space-between; font-size: 10px; color: var(--neon-cyan); font-weight: 700;">
+        <span>🔥 المتصدرون في البث</span>
+        <span style="color: var(--text-dim);">تفاعل مباشرة لتجميع النقاط</span>
+      </div>
+      <div id="leaderboard-items"></div>
+    </footer>
+  </div>
+
+  <script>
+    // Audio Engine
+    class AudioEngine {
+      constructor() { this.ctx = null; }
+      init() { if (!this.ctx) this.ctx = new (window.AudioContext || window.webkitAudioContext)(); }
+      play(freq, type = 'sine', dur = 0.1) {
+        this.init(); const o = this.ctx.createOscillator(), g = this.ctx.createGain();
+        o.type = type; o.frequency.setValueAtTime(freq, this.ctx.currentTime);
+        g.gain.setValueAtTime(0.2, this.ctx.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + dur);
+        o.connect(g); g.connect(this.ctx.destination);
+        o.start(); o.stop(this.ctx.currentTime + dur);
+      }
+      correct() { this.play(523, 'triangle', 0.2); setTimeout(() => this.play(1046, 'triangle', 0.3), 100); }
+      win() { [523, 659, 783, 1046].forEach((f, i) => setTimeout(() => this.play(f, 'square', 0.3), i * 100)); }
+    }
+    const audio = new AudioEngine();
+    document.addEventListener('click', () => audio.init(), { once: true });
+
+    // Confetti
+    const canvas = document.getElementById('confetti-canvas'), ctx = canvas.getContext('2d');
+    let particles = [];
+    function launchConfetti() {
+      canvas.width = canvas.parentElement.clientWidth; canvas.height = canvas.parentElement.clientHeight;
+      for (let i = 0; i < 70; i++) {
+        particles.push({
+          x: canvas.width / 2, y: canvas.height / 2,
+          vx: (Math.random() - 0.5) * 12, vy: (Math.random() - 1.2) * 12,
+          size: Math.random() * 6 + 4, color: ['#14b8a6', '#06b6d4', '#f59e0b', '#ec4899'][Math.floor(Math.random() * 4)],
+          gravity: 0.25, opacity: 1
+        });
+      }
+      animateConfetti();
+    }
+    function animateConfetti() {
+      if (!particles.length) return;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i]; p.x += p.vx; p.y += p.vy; p.vy += p.gravity; p.opacity -= 0.015;
+        if (p.opacity <= 0) { particles.splice(i, 1); continue; }
+        ctx.fillStyle = p.color; ctx.globalAlpha = p.opacity;
+        ctx.fillRect(p.x, p.y, p.size, p.size);
+      }
+      requestAnimationFrame(animateConfetti);
+    }
+
+    // Comprehensive Questions Bank
+    const QUESTIONS = [
+      { cat: "قرآن كريم 📖", q: "أكمل الآية الكريمة:\nقال تعالى: ﴿إِنَّا أَعْطَيْنَاكَ ...﴾", icon: "✨", a: "الْكَوْثَرَ", alts: ["الكوثر", "الكوثرا"] },
+      { cat: "قرآن كريم 📖", q: "أكمل الآية الكريمة:\nقال تعالى: ﴿وَالْعَصْرِ ۝ إِنَّ الْإِنسَانَ لَفِي ...﴾", icon: "✨", a: "خُسْرٍ", alts: ["خسر", "خسرا"] },
+      { cat: "قرآن كريم 📖", q: "ما هي أعظم آية في القرآن الكريم؟", icon: "🕌", a: "آية الكرسي", alts: ["اية الكرسي", "آية الكرسي", "الكرسي"] },
+      { cat: "معلومات قرآنية 🕋", q: "ما هي أطول سورة في القرآن الكريم؟", icon: "📖", a: "سورة البقرة", alts: ["البقرة", "سورة البقرة", "البقره"] },
+      { cat: "سيرة نبوية 🕊️", q: "من هو أول من آمن بالرسول ﷺ من الرجال؟", icon: "⭐", a: "أبو بكر الصديق", alts: ["ابو بكر", "أبو بكر", "الصديق"] },
+      { cat: "ثقافة عامة 🌍", q: "ما هو أطول نهر في العالم؟", icon: "🌊", a: "نهر النيل", alts: ["النيل", "نهر النيل", "نيل"] },
+      { cat: "عواصم العالم 🗼", q: "ما هي عاصمة اليابان؟", icon: "🗾", a: "طوكيو", alts: ["طوكيو", "tokyo"] },
+      { cat: "عواصم عربية 🇸🇦", q: "ما هي عاصمة المملكة العربية السعودية؟", icon: "🌴", a: "الرياض", alts: ["الرياض", "رياض"] },
+      { cat: "لغز وذكاء 💡", q: "ما هو الشيء الذي كلما أخذت منه كَبُر؟", icon: "🕳️", a: "الحفرة", alts: ["الحفرة", "حفرة", "الحفره"] },
+      { cat: "حساب سريع 🔢", q: "كم حاصل ضرب: 8 × 7 ؟", icon: "⚡", a: "56", alts: ["56", "٥٦"] },
+      { cat: "أعلام الدول 🇦🇷", q: "ما اسم هذه الدولة؟", img: "https://flagcdn.com/w640/ar.png", a: "الأرجنتين", alts: ["الارجنتين", "الأرجنتين", "argentina"] },
+      { cat: "أعلام الدول 🇰🇷", q: "ما اسم هذه الدولة؟", img: "https://flagcdn.com/w640/kr.png", a: "كوريا الجنوبية", alts: ["كوريا", "كوريا الجنوبية", "korea"] }
+    ];
+
+    function normAr(t) {
+      if (!t) return '';
+      return t.toString().trim().toLowerCase()
+        .replace(/[\u064B-\u065F\u0670]/g, '')
+        .replace(/[أإآ]/g, 'ا').replace(/ة/g, 'ه').replace(/ى/g, 'ي').replace(/\s+/g, ' ');
+    }
+
+    class Game {
+      constructor() {
+        this.users = new Map(); this.drawPool = []; this.qIdx = 0; this.timer = 15; this.tInterval = null;
+        this.autoPlayActive = false; this.autoInterval = null;
+        this.setMode('DRAW');
+
+        // Allow Enter key to submit
+        document.getElementById('user-input').addEventListener('keypress', (e) => {
+          if (e.key === 'Enter') this.submitFromInput();
+        });
+      }
+
+      setMode(m) {
+        this.mode = m; clearInterval(this.tInterval);
+        document.getElementById('timer-container').style.visibility = m === 'QUESTION' ? 'visible' : 'hidden';
+        if (m === 'DRAW') this.renderDraw();
+      }
+
+      renderDraw() {
+        document.getElementById('header-category').textContent = 'السحب والقرعة 🎁';
+        let h = ''; this.drawPool.forEach(u => h += `<div class="user-avatar-bubble"><img src="${u.avatar}"/></div>`);
+        document.getElementById('stage-area').innerHTML = `
+          <div class="glass-panel" style="padding: 14px; text-align: center;">
+            <h2 style="color: var(--neon-teal); font-size: 18px; margin-bottom: 8px;">المشاركون في السحب</h2>
+            <div class="participants-grid">${h || '<div style="grid-column: 1/-1; color: var(--text-dim); padding: 30px 0; font-size: 12px;">اكتب "تم" في الأسفل أو اضغط "تفاعل تلقائي"! 🎁</div>'}</div>
+            <div style="margin-top: 10px;"><div class="cta-banner"><span>📌 للمشاركة اكتب <b>تم</b> في التعليقات</span></div></div>
+          </div>`;
+        document.getElementById('stat-participants').textContent = this.drawPool.length;
+      }
+
+      submitFromInput() {
+        const input = document.getElementById('user-input');
+        const text = input.value.trim();
+        if (!text) return;
+        input.value = '';
+
+        const name = "أنت (المشارك)";
+        const u = { name, avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=me_${Date.now()}`, points: 0 };
+        this.handleAction(u, text);
+      }
+
+      handleAction(user, text) {
+        const norm = normAr(text);
+
+        if (this.mode === 'DRAW') {
+          if (norm === 'تم' || norm.includes('تم') || norm === '1') {
+            this.drawPool.push(user);
+            audio.play(880, 'sine', 0.1);
+            this.renderDraw();
+            this.updateLeaderboard();
+          }
+        } else if (this.mode === 'QUESTION') {
+          const cur = QUESTIONS[(this.qIdx - 1 + QUESTIONS.length) % QUESTIONS.length];
+          const isCorrect = cur.alts.some(a => norm === normAr(a) || norm.includes(normAr(a)));
+          if (isCorrect) {
+            audio.correct();
+            user.points = (user.points || 0) + 1;
+            this.drawPool.push(user);
+            this.updateLeaderboard();
+            alert(`🎉 إجابة صحيحة من: ${user.name}! (+1 نقطة)`);
+          } else {
+            audio.play(200, 'sawtooth', 0.2);
+          }
+        }
+      }
+
+      drawWinner() {
+        if (!this.drawPool.length) return alert('أضف مشاركين أولاً بكتابة "تم" أو اضغط زر تفاعل تلقائي!');
+        const winner = this.drawPool[Math.floor(Math.random() * this.drawPool.length)];
+        audio.win(); launchConfetti();
+        winner.points = (winner.points || 0) + 5;
+        document.getElementById('stage-area').innerHTML = `
+          <div class="winner-spotlight">
+            <h2 style="color: #fff; font-size: 20px; margin-bottom: 6px;">🎉 مبروك الفائز بالقرعة! 🎉</h2>
+            <div class="winner-avatar"><img src="${winner.avatar}"/></div>
+            <div style="font-size: 18px; font-weight: 900; color: #fff;">${winner.name}</div>
+            <div style="font-size: 12px; color: var(--neon-gold); margin-top: 4px;">🏆 فاز بـ 5 نقاط في المسابقة</div>
+          </div>`;
+        this.updateLeaderboard();
+      }
+
+      nextQuestion() {
+        this.mode = 'QUESTION';
+        const cur = QUESTIONS[this.qIdx % QUESTIONS.length]; this.qIdx++;
+        document.getElementById('header-category').textContent = cur.cat;
+        document.getElementById('timer-container').style.visibility = 'visible';
+
+        const imgOrIcon = cur.img 
+          ? `<div class="question-image-box"><img src="${cur.img}"/></div>`
+          : `<div class="question-icon">${cur.icon || '❓'}</div>`;
+
+        document.getElementById('stage-area').innerHTML = `
+          <div class="glass-panel question-card">
+            ${imgOrIcon}
+            <h2 class="question-title">${cur.q.replace(/\n/g, '<br/>')}</h2>
+            <div><div class="cta-banner"><span>⌨️ اكتب إجابتك في الشات الآن</span></div></div>
+          </div>`;
+
+        this.timer = 15;
+        const circ = 2 * Math.PI * 20;
+        const bar = document.getElementById('timer-bar');
+        bar.style.strokeDasharray = circ;
+        clearInterval(this.tInterval);
+        this.tInterval = setInterval(() => {
+          this.timer--;
+          document.getElementById('timer-text').textContent = this.timer;
+          bar.style.strokeDashoffset = circ - (this.timer / 15) * circ;
+          audio.play(700, 'sine', 0.04);
+          if (this.timer <= 0) {
+            clearInterval(this.tInterval);
+            audio.win();
+            document.getElementById('stage-area').innerHTML = `
+              <div class="glass-panel" style="padding: 20px; text-align: center;">
+                <div style="font-size: 13px; color: var(--text-dim);">الإجابة الصحيحة هي:</div>
+                <div style="font-size: 24px; font-weight: 900; color: #34d399; margin-top: 8px;">${cur.a} ✅</div>
+              </div>`;
+          }
+        }, 1000);
+      }
+
+      toggleAutoPlay() {
+        this.autoPlayActive = !this.autoPlayActive;
+        const btn = document.getElementById('auto-btn');
+        if (this.autoPlayActive) {
+          btn.textContent = '⏹️ إيقاف التفاعل';
+          btn.style.background = '#ef4444';
+          this.autoInterval = setInterval(() => {
+            const names = ['سارة_العتيبي', 'محمد_القحطاني', 'نورة_الشمري', 'أحمد_الدوسري', 'فيصل_الحربي', 'ياسين_الجزائري', 'ريم_العبدالله'];
+            const name = names[Math.floor(Math.random() * names.length)];
+            const u = { name, avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${name}_${Math.random()}`, points: Math.floor(Math.random() * 3) + 1 };
+            
+            if (this.mode === 'DRAW') {
+              this.handleAction(u, 'تم');
+            } else {
+              const cur = QUESTIONS[(this.qIdx - 1 + QUESTIONS.length) % QUESTIONS.length];
+              const ans = Math.random() > 0.4 ? cur.alts[0] : 'إجابة عشوائية';
+              this.handleAction(u, ans);
+            }
+          }, 1500);
+        } else {
+          btn.textContent = '⚡ تفاعل تلقائي';
+          btn.style.background = '#db2777';
+          clearInterval(this.autoInterval);
+        }
+      }
+
+      updateLeaderboard() {
+        const sorted = [...this.drawPool].sort((a, b) => (b.points || 0) - (a.points || 0)).slice(0, 3);
+        let h = '';
+        sorted.forEach((u, i) => h += `<div class="lb-row"><div class="lb-user"><span>${['🥇','🥈','🥉'][i]}</span><img src="${u.avatar}"/><span>${u.name}</span></div><div style="color: var(--neon-teal); font-weight: 900;">${u.points} نقطة</div></div>`);
+        document.getElementById('leaderboard-items').innerHTML = h || '<div style="color: var(--text-dim); text-align: center; font-size: 10px;">في انتظار المتصدرين...</div>';
+      }
+    }
+    const game = new Game();
+  </script>
+</body>
+</html>
