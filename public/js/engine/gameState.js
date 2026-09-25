@@ -71,6 +71,7 @@ class GameState {
         likes: 0,
         initialLikes: null,
         shares: 0,
+        comments: 0,
         followers: 0,
         viewerCount: 0,
         peakViewers: 0,
