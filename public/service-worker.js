@@ -3,7 +3,7 @@
  * Caches essential static assets (HTML, CSS, JS, icons) while strictly
  * bypassing dynamic TikTok streams, SSE (/api/events), and live REST endpoints.
  */
-const CACHE_NAME = 'byequiz-v2-static';
+const CACHE_NAME = 'byequiz-v3-static';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
@@ -67,6 +67,12 @@ self.addEventListener('activate', (event) => {
 
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
+
+  // The service worker itself must never be served from an old cache.
+  if (url.pathname === '/service-worker.js') {
+    event.respondWith(fetch(event.request, { cache: 'no-store' }));
+    return;
+  }
 
   // 1. NEVER cache SSE, API endpoints or live commands
   if (url.pathname.startsWith('/api/') || url.pathname.includes('/events') || url.pathname.includes('/command')) {
