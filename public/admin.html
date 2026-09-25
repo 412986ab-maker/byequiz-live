@@ -349,6 +349,11 @@
           </div>
         </div>
 
+        <div style="display:flex;justify-content:flex-start;gap:8px;margin-top:12px;">
+          <button class="btn btn-emerald" type="button" onclick="saveSettings()">💾 حفظ الإعدادات</button>
+          <span id="settings-save-status" style="font-size:12px;color:var(--text-dim);align-self:center;"></span>
+        </div>
+
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 8px; margin-top: 10px;">
           <div class="toggle-row">
             <span class="toggle-label">الوضع التلقائي (AUTO MODE):</span>
@@ -938,20 +943,59 @@
       const engagementIntensity = document.getElementById('setting-intensity').value;
       const giftPointsRate = parseFloat(document.getElementById('setting-gift-points-rate').value) || 1;
 
-      sendCmd('UPDATE_SETTINGS', {
-        targetParticipants,
-        questionDuration,
-        questionSelectionMode,
-        autoMode,
-        autoTransition: autoMode,
-        autoNextRound,
-        excludePreviousWinner,
-        engagementEnabled,
-        engagementSound,
-        engagementIntensity,
-        giftPointsRate
-      });
+      window.pendingGameSettings = {
+        targetParticipants, questionDuration, questionSelectionMode, autoMode,
+        autoTransition: autoMode, autoNextRound, excludePreviousWinner,
+        engagementEnabled, engagementSound, engagementIntensity, giftPointsRate
+      };
+      const status = document.getElementById('settings-save-status');
+      if (status) status.textContent = 'تغييرات غير محفوظة';
     }
+
+    async function saveSettings() {
+      syncSettings();
+      const settings = window.pendingGameSettings || {};
+      try {
+        const res = await fetch('/api/settings', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ settings })
+        });
+        const data = await res.json();
+        if (!data.success) throw new Error(data.error || 'فشل الحفظ');
+        sendCmd('UPDATE_SETTINGS', settings);
+        const status = document.getElementById('settings-save-status');
+        if (status) status.textContent = '✓ تم حفظ الإعدادات';
+      } catch (err) {
+        const status = document.getElementById('settings-save-status');
+        if (status) status.textContent = '✗ فشل حفظ الإعدادات';
+        alert('تعذر حفظ الإعدادات: ' + err.message);
+      }
+    }
+
+    async function loadSavedSettings() {
+      try {
+        const res = await fetch('/api/settings');
+        const data = await res.json();
+        const s = data.settings || {};
+        if (s.targetParticipants !== undefined) document.getElementById('setting-target').value = String(s.targetParticipants);
+        if (s.questionDuration !== undefined) document.getElementById('setting-q-duration').value = String(s.questionDuration);
+        if (s.questionSelectionMode) document.getElementById('setting-q-mode').value = s.questionSelectionMode;
+        if (s.autoMode !== undefined) document.getElementById('toggle-auto-mode').checked = !!s.autoMode;
+        if (s.autoNextRound !== undefined) document.getElementById('toggle-auto-next').checked = !!s.autoNextRound;
+        if (s.excludePreviousWinner !== undefined) document.getElementById('toggle-exclude-winner').checked = !!s.excludePreviousWinner;
+        if (s.engagementIntensity) document.getElementById('setting-intensity').value = s.engagementIntensity;
+        if (s.giftPointsRate !== undefined) document.getElementById('setting-gift-points-rate').value = s.giftPointsRate;
+        if (s.engagementEnabled !== undefined) document.getElementById('toggle-engagement-on').checked = !!s.engagementEnabled;
+        if (s.engagementSound !== undefined) document.getElementById('toggle-engagement-sound').checked = !!s.engagementSound;
+        window.pendingGameSettings = s;
+        const status = document.getElementById('settings-save-status');
+        if (status) status.textContent = 'الإعدادات المحفوظة';
+      } catch (err) {
+        console.warn('Failed to load saved settings', err);
+      }
+    }
+
 
     // Connect to TikTok Live
     document.getElementById('btn-connect').addEventListener('click', async () => {
@@ -1087,6 +1131,7 @@
 
     // Initialize Questions and SSE on startup
     loadQuestionsTable();
+    loadSavedSettings();
     initAdminSSE();
   </script>
 </body>
