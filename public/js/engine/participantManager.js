@@ -108,6 +108,40 @@ class ParticipantManager {
     return { success: true, user };
   }
 
+  syncFromSnapshot(participants = [], drawPool = []) {
+    this.participants.clear();
+    const list = Array.isArray(participants) ? participants : [];
+    for (const raw of list) {
+      if (!raw || raw.id === undefined) continue;
+      const id = String(raw.id);
+      this.participants.set(id, {
+        ...raw,
+        id,
+        username: raw.username || raw.uniqueId || id,
+        uniqueId: raw.uniqueId || raw.username || id,
+        displayName: raw.displayName || raw.nickname || raw.username || id,
+        nickname: raw.nickname || raw.displayName || raw.username || id,
+        avatar: raw.avatar || raw.profilePictureUrl || ParticipantCard.getFallbackAvatar(raw.displayName || raw.nickname || id),
+        answers: Array.isArray(raw.answers) ? raw.answers : [],
+        correctAnswers: Number(raw.correctAnswers || 0),
+        wrongAnswers: Number(raw.wrongAnswers || 0),
+        score: Number(raw.score || raw.points || 0),
+        points: Number(raw.points || raw.score || 0),
+        gifts: Number(raw.gifts || 0),
+        eligibleForDraw: raw.eligibleForDraw !== false,
+        streak: Number(raw.streak || 0),
+        level: Number(raw.level || 1)
+      });
+    }
+    const ids = Array.isArray(drawPool) ? drawPool.map(String) : [];
+    this.drawPool = ids.filter(id => this.participants.has(id));
+    this.events.emit('PARTICIPANTS_UPDATED', {
+      count: this.drawPool.length,
+      target: this.state.get('settings').targetParticipants || 0,
+      participants: this.getDrawPoolUsers()
+    });
+  }
+
   isRegistered(id) {
     if (!id) return false;
     const strId = id.toString();
