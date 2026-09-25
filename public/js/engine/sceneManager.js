@@ -12,6 +12,8 @@ class SceneManager {
     this.stats = statisticsEngine;
 
     this.currentScene = 'JOIN';
+    this.seatPage = 0;
+    this.seatPageTimer = null;
     this.rouletteInterval = null;
     this.dom = {
       stage: typeof document !== 'undefined' ? document.getElementById('stage-area') : null,
@@ -266,12 +268,37 @@ class SceneManager {
     const target = this.state.get('settings').targetParticipants || 36;
     const pool = this.participants.getDrawPoolUsers();
 
+    // The mobile broadcast stage has 36 visible seats (6x6).
+    // Larger rounds are paged automatically so cards never overlap or shrink into unusable tiles.
+    const visibleSeats = 36;
+    const pageCount = Math.max(1, Math.ceil(Math.max(pool.length, target) / visibleSeats));
+    this.seatPage = Math.min(this.seatPage, pageCount - 1);
+
+    const start = this.seatPage * visibleSeats;
+    const visiblePool = pool.slice(start, start + visibleSeats);
+
     let html = '';
-    for (let i = 0; i < target; i++) {
-      const user = pool[i] || null;
-      html += ParticipantCard.renderSlot(user, i, target);
+    for (let i = 0; i < visibleSeats; i++) {
+      const globalIndex = start + i;
+      const user = visiblePool[i] || null;
+      html += ParticipantCard.renderSlot(user, globalIndex, target);
     }
     gridEl.innerHTML = html;
+    gridEl.dataset.page = String(this.seatPage + 1);
+    gridEl.dataset.pages = String(pageCount);
+
+    if (this.seatPageTimer) {
+      clearInterval(this.seatPageTimer);
+      this.seatPageTimer = null;
+    }
+    if (pageCount > 1) {
+      this.seatPageTimer = setInterval(() => {
+        const currentPool = this.participants.getDrawPoolUsers();
+        const currentPages = Math.max(1, Math.ceil(Math.max(currentPool.length, target) / visibleSeats));
+        this.seatPage = (this.seatPage + 1) % currentPages;
+        this.renderRegistrationGrid();
+      }, 4500);
+    }
   }
 
   // 3. COUNTDOWN & PARTICIPANTS COMPLETE SCENE
