@@ -169,6 +169,11 @@ class GameEngine {
         break;
       }
 
+      case "RESET_QUESTION_HISTORY": {
+        this.questions.resetHistory();
+        break;
+      }
+
       case "SETTINGS_UPDATED":
       case "UPDATE_SETTINGS": {
         const settings = payload && payload.settings ? payload.settings : payload || {};
