@@ -318,6 +318,38 @@ const server = http.createServer(async (req, res) => {
   }
 
   // ==========================================
+  // 5.1 PERSISTENT GAME SETTINGS
+  // ==========================================
+  if (pathname === '/api/settings' && req.method === 'GET') {
+    const settings = await db.getSettings();
+    return sendJSON(res, 200, { success: true, settings });
+  }
+
+  if (pathname === '/api/settings' && req.method === 'POST') {
+    let body = '';
+    req.on('data', chunk => body += chunk);
+    req.on('end', async () => {
+      const incoming = safeJSONParse(body, {});
+      const settings = incoming.settings && typeof incoming.settings === 'object' ? incoming.settings : incoming;
+      const allowed = ['targetParticipants','questionDuration','questionSelectionMode','autoMode','autoTransition','autoNextRound','excludePreviousWinner','engagementEnabled','engagementSound','engagementIntensity','giftPointsRate'];
+      const clean = {};
+      for (const key of allowed) if (settings[key] !== undefined) clean[key] = settings[key];
+      if (clean.targetParticipants !== undefined) clean.targetParticipants = parseInt(clean.targetParticipants, 10);
+      if (clean.questionDuration !== undefined) clean.questionDuration = parseInt(clean.questionDuration, 10);
+      if (clean.giftPointsRate !== undefined) clean.giftPointsRate = Number(clean.giftPointsRate);
+      if (clean.autoMode !== undefined) serverGameState.autoMode = Boolean(clean.autoMode);
+      if (clean.autoTransition !== undefined) serverGameState.autoTransition = Boolean(clean.autoTransition);
+      if (clean.excludePreviousWinner !== undefined) serverGameState.excludePreviousWinner = Boolean(clean.excludePreviousWinner);
+      if (clean.targetParticipants !== undefined) serverGameState.targetParticipants = clean.targetParticipants;
+      if (clean.questionDuration !== undefined) serverGameState.questionDuration = clean.questionDuration;
+      const ok = await db.setSettings(clean);
+      eventBus.dispatch('SETTINGS_UPDATED', { settings: clean }, 'ADMIN');
+      return sendJSON(res, ok ? 200 : 500, { success: ok, settings: clean });
+    });
+    return;
+  }
+
+  // ==========================================
   // 5. GAME CONTROL COMMAND API
   // ==========================================
   if (pathname === '/api/command' && req.method === 'POST') {
