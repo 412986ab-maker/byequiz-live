@@ -407,6 +407,10 @@ const server = http.createServer(async (req, res) => {
           serverGameState.resetAll();
           break;
         }
+        case 'RESET_QUESTION_HISTORY': {
+          eventBus.dispatch('RESET_QUESTION_HISTORY', {}, 'ADMIN');
+          break;
+        }
         case 'UPDATE_SETTINGS': {
           if (cmd.payload) {
             if (cmd.payload.targetParticipants !== undefined) serverGameState.targetParticipants = parseInt(cmd.payload.targetParticipants, 10);
@@ -447,6 +451,7 @@ const server = http.createServer(async (req, res) => {
     const search = (parsedUrl.searchParams.get('search') || '').toLowerCase().trim();
     const category = parsedUrl.searchParams.get('category') || '';
     const difficulty = parsedUrl.searchParams.get('difficulty') || '';
+    const type = parsedUrl.searchParams.get('type') || '';
     const page = parseInt(parsedUrl.searchParams.get('page') || '1', 10);
     const limit = parseInt(parsedUrl.searchParams.get('limit') || '100', 10);
 
@@ -460,6 +465,7 @@ const server = http.createServer(async (req, res) => {
     }
     if (category) filtered = filtered.filter(q => q.category === category);
     if (difficulty) filtered = filtered.filter(q => q.difficulty === difficulty);
+    if (type) filtered = filtered.filter(q => q.type === type);
 
     const total = filtered.length;
     const startIndex = (page - 1) * limit;
@@ -559,9 +565,10 @@ const server = http.createServer(async (req, res) => {
       await db.setQuestions(list);
 
       eventBus.dispatch('QUESTION_CREATED', qObj, 'ADMIN');
-      logger.info('Custom live question created and added to bank', { id: qObj.id, question: qObj.question });
+      serverGameState.startQuestion(qObj.id);
+      logger.info('Custom live question created and started', { id: qObj.id, question: qObj.question });
 
-      return sendJSON(res, 200, { success: true, count: 1, question: qObj });
+      return sendJSON(res, 200, { success: true, count: 1, started: true, question: qObj });
     });
     return;
   }
