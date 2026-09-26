@@ -184,6 +184,11 @@ class GameEngine {
       // 1. Live Chat / Answers
       case "CHAT": {
         this.answers.processComment(payload, payload.comment || "");
+        // Keep the compact LIVE comment counter responsive immediately.
+        // COMMENT_COUNT_UPDATED from the server remains the authoritative reconciliation.
+        const engagement = this.state.get("engagement") || {};
+        engagement.comments = Number(engagement.comments || 0) + 1;
+        this.state.updateEngagement(engagement);
         this.events.emit("chat:received", payload);
         this.renderChatMessage(payload);
         break;
