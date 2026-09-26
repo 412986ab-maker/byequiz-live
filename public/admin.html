@@ -304,6 +304,9 @@
           <button class="btn btn-dark" onclick="sendCmd('RESET_ROUND')"> إعادة تعيين الجولة</button>
           <button class="btn btn-rose" onclick="sendCmd('STOP_GAME')"> إيقاف اللعبة</button>
         </div>
+        <div id="command-status" style="margin-top:10px;padding:8px 10px;border-radius:8px;background:rgba(15,23,42,.7);border:1px solid rgba(45,212,191,.15);font-size:12px;color:var(--text-dim);">
+          جاهز لاستقبال أوامر الإدارة.
+        </div>
       </div>
 
       <!-- Round & Scoring Settings -->
@@ -685,6 +688,8 @@
     }
 
     async function sendCmd(type, payload = {}) {
+      const status = document.getElementById('command-status');
+      if (status) status.textContent = 'جارٍ تنفيذ: ' + type + ' ...';
       try {
         const res = await fetch('/api/command', {
           method: 'POST',
@@ -694,14 +699,15 @@
         const data = await res.json().catch(() => ({}));
         if (!res.ok || data.success === false) {
           console.warn('Command rejected:', type, data);
-          if (type === 'SIMULATE_EVENT') {
-            alert(data.error || 'المحاكي غير متاح في وضع الإنتاج.');
-          }
+          if (status) status.textContent = '✗ فشل ' + type + ': ' + (data.error || ('HTTP ' + res.status));
+          if (type === 'SIMULATE_EVENT') alert(data.error || 'المحاكي غير متاح في وضع الإنتاج.');
           return false;
         }
+        if (status) status.textContent = '✓ تم تنفيذ ' + type;
         return true;
       } catch (e) {
         console.error('Command error:', e);
+        if (status) status.textContent = '✗ تعذر الاتصال بالخادم لتنفيذ ' + type;
         return false;
       }
     }
@@ -880,11 +886,13 @@
       }
 
       try {
-        await fetch('/api/questions/custom', {
+        const res = await fetch('/api/questions/custom', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ question, options, correctAnswer })
         });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok || !data.success) throw new Error(data.error || 'تعذر إطلاق السؤال');
         closeModal('modal-custom');
         alert('تم إطلاق السؤال المباشر في البث بنجاح!');
       } catch (err) {
@@ -975,9 +983,10 @@
         });
         const data = await res.json();
         if (!data.success) throw new Error(data.error || 'فشل الحفظ');
-        sendCmd('UPDATE_SETTINGS', settings);
+        const commandOk = await sendCmd('UPDATE_SETTINGS', settings);
+        if (!commandOk) throw new Error('تم حفظ الإعدادات في قاعدة البيانات لكن تعذر تطبيقها على حالة اللعبة الحالية');
         const status = document.getElementById('settings-save-status');
-        if (status) status.textContent = '✓ تم حفظ الإعدادات';
+        if (status) status.textContent = '✓ تم حفظ الإعدادات وتطبيقها';
       } catch (err) {
         const status = document.getElementById('settings-save-status');
         if (status) status.textContent = '✗ فشل حفظ الإعدادات';
